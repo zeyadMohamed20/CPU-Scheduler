@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class SJF extends  Scheduler
 {
-    public SJF(ArrayList<Process> readyQueue, int quantum, boolean preemptive, SchedulerType schedulingAlgo)
+    public SJF(ArrayList<Process> readyQueue, boolean preemptive)
     {
-        super(readyQueue, quantum, preemptive, schedulingAlgo);
+        super(readyQueue, preemptive);
     }
 
     @Override
