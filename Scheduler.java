@@ -2,16 +2,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-enum SchedulerType
-{
-    FCFS,
-    SJF_Premptive,
-    SJF_NON_PREEMPTIVE,
-    PRIORITY_PREEMPTIVE,
-    PRIORITY_NON_PREEMPTIVE,
-    ROUND_ROBIN
-}
-
 enum SORTING_CRITERIA
 {
     ID,
@@ -29,13 +19,20 @@ public abstract class Scheduler
     protected boolean preemptive;
 
     //Parametrized Constructor to initialize attributes
-    public Scheduler(ArrayList<Process> readyQueue,int quantum,boolean preemptive,SchedulerType schedulingAlgo)
+    public Scheduler(ArrayList<Process> readyQueue,boolean preemptive)
+    {
+        this.readyQueue = readyQueue;
+        this.preemptive = preemptive;
+    }
+    public Scheduler(ArrayList<Process> readyQueue,int quantum)
     {
         this.readyQueue = readyQueue;
         this.quantum = quantum;
-        this.preemptive = preemptive;
     }
-
+    public Scheduler(ArrayList<Process> readyQueue)
+    {
+        this.readyQueue = readyQueue;
+    }
     //Add process to ready queue
     public void add_process(Process p)
     {
