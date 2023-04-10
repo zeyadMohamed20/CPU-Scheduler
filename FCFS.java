@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class FCFS extends  Scheduler
 {
-    public FCFS(ArrayList<Process> readyQueue, int quantum, boolean preemptive, SchedulerType schedulingAlgo)
+    public FCFS(ArrayList<Process> readyQueue)
     {
-        super(readyQueue, quantum, preemptive, schedulingAlgo);
+        super(readyQueue);
     }
 
     @Override
