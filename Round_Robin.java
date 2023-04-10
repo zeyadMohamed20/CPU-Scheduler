@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class Round_Robin extends  Scheduler
 {
-    public Round_Robin(ArrayList<Process> readyQueue, int quantum, boolean preemptive, SchedulerType schedulingAlgo)
+    public Round_Robin(ArrayList<Process> readyQueue, int quantum)
     {
-        super(readyQueue, quantum, preemptive, schedulingAlgo);
+        super(readyQueue, quantum);
     }
 
     @Override
