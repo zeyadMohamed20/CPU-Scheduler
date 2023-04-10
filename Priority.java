@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class Priority extends  Scheduler
 {
-    public Priority(ArrayList<Process> readyQueue, int quantum, boolean preemptive, SchedulerType schedulingAlgo)
+    public Priority(ArrayList<Process> readyQueue, boolean preemptive)
     {
-        super(readyQueue, quantum, preemptive, schedulingAlgo);
+        super(readyQueue, preemptive);
     }
 
     @Override
