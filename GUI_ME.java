@@ -1,9 +1,14 @@
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 
 public class GUI_ME {
+
 
     public static JLabel turnTime_value;
     public static JLabel wait_value;
@@ -29,13 +34,14 @@ public class GUI_ME {
 
         Color custom_backcolor = new Color(220, 204, 162);
         // Color custom_backcolor = new Color(69,73,74);
-        // Color custom_backcolor = new Color(17,30,48);
-        // Color custom_backcolor = new Color(14,32,30);
+        //  Color custom_backcolor = new Color(17,30,48);
+          Color custom_backcolor = new Color(14,32,30);
+
 
         JFrame mainFrame = new JFrame("Scheduler");
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        mainFrame.setSize(600, 400);
+        mainFrame.setSize(600,400);
         mainFrame.setBackground(Color.black);
 
         JPanel panel_Left = new JPanel();
@@ -52,17 +58,19 @@ public class GUI_ME {
         JLabel label1 = new JLabel("Number of Processes: ");
         JTextField txt_Field1 = new JTextField(9);
 
+        SpinnerNumberModel model = new SpinnerNumberModel(0,0,100,1);
+        JSpinner spinner_field = new JSpinner(model);
+
         leftPanel_One.add(label1);
-        leftPanel_One.add(txt_Field1);
+        leftPanel_One.add(spinner_field);
 
 
         JPanel leftPanel_Two = new JPanel();
         leftPanel_Two.setLayout(new FlowLayout());
         leftPanel_Two.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
         JLabel label2 = new JLabel("Scheduler Type: ");
-        String[] schedule_Options = { "--Select Schedular--", "FCFS", "SJF_Preemptive", "SJF_Non Preemptive", "Round_Robin", "Priority" };
-        comboBox = new JComboBox<String>(schedule_Options);
-        comboBox.addActionListener(e -> SchedulerChange());
+        String [] schedule_Options = {"FCFS","SJF_Preemptive", "SJF_Non Preemptive","Round_Robin", "Priority"};
+        JComboBox<String> comboBox = new JComboBox<String>(schedule_Options);
         leftPanel_Two.add(label2);
         leftPanel_Two.add(comboBox);
 
@@ -77,7 +85,7 @@ public class GUI_ME {
         leftPanel_three.setLayout(new BorderLayout());
         leftPanel_three.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JTable table1 = new JTable(9, 5);
+        JTable table1 = new JTable(9,5);
         table1.setFillsViewportHeight(true);
         table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -88,8 +96,7 @@ public class GUI_ME {
         button_pane.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
         button_pane.setBorder(BorderFactory.createEmptyBorder(200, 10, 10, 10));
 
-        JButton b1 = new JButton("Static Schedule");
-        b1.addActionListener(e -> StaticButtonPressed());
+        JButton b1 = new JButton("Static Schedule") ;
         JButton b2 = new JButton("Dynamic Schedule");
         b2.addActionListener(e -> DynamicButtonPressed());
 
@@ -102,7 +109,10 @@ public class GUI_ME {
         panel_Left.add(panel_Left_Container1, BorderLayout.NORTH);
         panel_Left.add(panel_Left_Container2, BorderLayout.CENTER);
 
-        // ===============================================================================
+        panel_Left.add(panel_Left_Container1,BorderLayout.NORTH);
+        panel_Left.add(panel_Left_Container2,BorderLayout.CENTER);
+
+        //===============================================================================
 
         JPanel panel_right = new JPanel();
         panel_right.setLayout(new BorderLayout());
@@ -134,7 +144,7 @@ public class GUI_ME {
         times_panel.add(waitBox);
         times_panel.add(turnTimeBox);
 
-        JTable process_table = new JTable(2, 5); // 2 is constant but colomn depends on process_num
+        JTable process_table = new JTable(2,5);  // 2  is constant but colomn depends on process_num
         process_table.setFillsViewportHeight(true);
         process_table.setPreferredScrollableViewportSize(process_table.getPreferredSize());
         process_table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -148,7 +158,8 @@ public class GUI_ME {
         panel_right.add(sp2, BorderLayout.NORTH);
         panel_right.add(time_container, BorderLayout.CENTER);
 
-        // ================ COLOR ===============================
+
+        //================ COLOR ===============================
         panel_right.setBackground(custom_backcolor);
         panel_Left.setBackground(custom_backcolor);
         panel_Left_Container1.setBackground(custom_backcolor);
@@ -170,22 +181,23 @@ public class GUI_ME {
         wait_value.setForeground(Color.BLUE);
         turnTime_value.setForeground(Color.BLUE);
 
-        /*
-         * // option 2,3,4 only
-         * label1.setForeground(Color.WHITE);
-         * label2.setForeground(Color.WHITE);
-         * label3.setForeground(Color.WHITE);
-         * label4.setForeground(Color.WHITE);
-         * wait_value.setForeground(Color.WHITE);
-         * turnTime_value.setForeground(Color.WHITE);
-         */
-        // =======================================================
 
-        JPanel main_Panel = new JPanel();
+        // option 2,3,4 only
+        label1.setForeground(Color.WHITE);
+        label2.setForeground(Color.WHITE);
+        label3.setForeground(Color.WHITE);
+        label4.setForeground(Color.WHITE);
+        wait_value.setForeground(Color.WHITE);
+        turnTime_value.setForeground(Color.WHITE);
+
+        //=======================================================
+
+
+        /*JPanel main_Panel = new JPanel();
         main_Panel.setLayout(new BorderLayout());
-        main_Panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
-        main_Panel.add(panel_Left, BorderLayout.WEST);
-        main_Panel.add(panel_right, BorderLayout.EAST);
+        main_Panel.setBorder(BorderFactory.createEmptyBorder(15,10,10,10));
+        main_Panel.add(panel_Left,BorderLayout.WEST);
+        main_Panel.add(panel_right,BorderLayout.EAST);
 
         JSplitPane spl = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel_Left, panel_right);
         spl.setDividerLocation(700);
@@ -198,6 +210,10 @@ public class GUI_ME {
         mainFrame.setBackground(custom_backcolor);
 
         mainFrame.setVisible(true);
+
+        //=====================================================================
+
+
 
     }
 
