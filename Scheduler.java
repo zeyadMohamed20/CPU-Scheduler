@@ -95,9 +95,9 @@ public abstract class Scheduler
 
     }
     //To execute scheduling algorithm then:
-    // calculate ganttchart fromm drived class and store it into ganttchart attribute
-    // calculate avaerage turnaround and store it into averageTurnAround attribute
-    // calculate avaerage waiting and store it into averageWaiting attribute
+    // calculate ganttchart from drived class and store it into ganttchart attribute
+    // calculate average turn around and store it into averageTurnAround attribute
+    // calculate average waiting and store it into averageWaiting attribute
     public void execute()
     {
         this.ganttChart = get_GanttChart();
