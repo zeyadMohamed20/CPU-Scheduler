@@ -35,7 +35,7 @@ public class GUI_ME {
         Color custom_backcolor = new Color(220, 204, 162);
         // Color custom_backcolor = new Color(69,73,74);
         //  Color custom_backcolor = new Color(17,30,48);
-          Color custom_backcolor = new Color(14,32,30);
+        //  Color custom_backcolor = new Color(14,32,30);
 
 
         JFrame mainFrame = new JFrame("Scheduler");
@@ -71,6 +71,7 @@ public class GUI_ME {
         JLabel label2 = new JLabel("Scheduler Type: ");
         String [] schedule_Options = {"FCFS","SJF_Preemptive", "SJF_Non Preemptive","Round_Robin", "Priority"};
         JComboBox<String> comboBox = new JComboBox<String>(schedule_Options);
+        comboBox.addActionListener(e -> SchedulerChange());
         leftPanel_Two.add(label2);
         leftPanel_Two.add(comboBox);
 
@@ -98,6 +99,7 @@ public class GUI_ME {
 
         JButton b1 = new JButton("Static Schedule") ;
         JButton b2 = new JButton("Dynamic Schedule");
+        b1.addActionListener(e -> StaticButtonPressed());
         b2.addActionListener(e -> DynamicButtonPressed());
 
         button_pane.add(b1);
@@ -182,18 +184,18 @@ public class GUI_ME {
         turnTime_value.setForeground(Color.BLUE);
 
 
-        // option 2,3,4 only
+        /*  option 2,3,4 only
         label1.setForeground(Color.WHITE);
         label2.setForeground(Color.WHITE);
         label3.setForeground(Color.WHITE);
         label4.setForeground(Color.WHITE);
         wait_value.setForeground(Color.WHITE);
         turnTime_value.setForeground(Color.WHITE);
-
+*/
         //=======================================================
 
 
-        /*JPanel main_Panel = new JPanel();
+        JPanel main_Panel = new JPanel();
         main_Panel.setLayout(new BorderLayout());
         main_Panel.setBorder(BorderFactory.createEmptyBorder(15,10,10,10));
         main_Panel.add(panel_Left,BorderLayout.WEST);
