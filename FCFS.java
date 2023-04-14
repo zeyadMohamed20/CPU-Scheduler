@@ -52,11 +52,12 @@ public class FCFS extends  Scheduler
      
          sort(SORTING_CRITERIA.valueOf("ARRIVAL_TIME"));
         int c=0;
-
-        int cumv = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
+        int cumv1 = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
+         int cumv2 = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
+         int cumv3 = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
         if(readyQueue.get(0).getArrivalTime() > 0){
             IDLE.add(new Gantt_Process(0,0, readyQueue.get(0).getArrivalTime()));
-            ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),readyQueue.get(0).getArrivalTime(),cumv));
+            ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),readyQueue.get(0).getArrivalTime(),cumv1));
              for (int i = 1; i < readyQueue.size(); i++) 
              {
                  c = readyQueue.get(i-1).getArrivalTime()+readyQueue.get(i-1).getBurstTime();
@@ -65,20 +66,24 @@ public class FCFS extends  Scheduler
                  {
                      IDLE.add(new Gantt_Process(0,c,readyQueue.get(i).getArrivalTime()));
                      
-                     cumv = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv ,readyQueue.get(i).getBurstTime()+ cumv));
+                     cumv1 = readyQueue.get(i).getArrivalTime();
+                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv1 ,readyQueue.get(i).getBurstTime()+ cumv1));
                    
                     
-                 }else{
-                     cumv = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv,readyQueue.get(i).getBurstTime()+ cumv));
+                 }else if(readyQueue.get(i).getArrivalTime() == c){
+                     cumv3 = readyQueue.get(i).getArrivalTime();
+                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv3 ,readyQueue.get(i).getBurstTime()+ cumv3));
+                 }
+                 else{
+                     cumv2 = ganttChart.get(i-1).getEndTime();
+                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv2,readyQueue.get(i).getBurstTime()+ cumv2));
                   
 
                  }
 
              }
         }else{
-             ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),readyQueue.get(0).getArrivalTime(),cumv));
+              ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),readyQueue.get(0).getArrivalTime(),cumv1));
              for (int i = 1; i < readyQueue.size(); i++) 
              {
                  c = readyQueue.get(i-1).getArrivalTime()+readyQueue.get(i-1).getBurstTime();
@@ -87,13 +92,17 @@ public class FCFS extends  Scheduler
                  {
                      IDLE.add(new Gantt_Process(0,c,readyQueue.get(i).getArrivalTime()));
                      
-                     cumv = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv ,readyQueue.get(i).getBurstTime()+ cumv));
+                     cumv1 = readyQueue.get(i).getArrivalTime();
+                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv1 ,readyQueue.get(i).getBurstTime()+ cumv1));
                    
                     
-                 }else{
-                     cumv = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv,readyQueue.get(i).getBurstTime()+ cumv));
+                 }else if(readyQueue.get(i).getArrivalTime() == c){
+                     cumv3 = readyQueue.get(i).getArrivalTime();
+                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv3 ,readyQueue.get(i).getBurstTime()+ cumv3));
+                 }
+                 else{
+                     cumv2 = ganttChart.get(i-1).getEndTime();
+                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv2,readyQueue.get(i).getBurstTime()+ cumv2));
                   
 
                  }
@@ -111,7 +120,7 @@ public class FCFS extends  Scheduler
          sortGantt(SORTING_CRITERIA2.valueOf("START_TIME"));
         return merge;
     }
- 
+    
 
 }
     
