@@ -96,7 +96,69 @@ public class Priority extends  Scheduler
      */
     public void preemptive_priority()
     {
-        
+        int totalProcessTime;
+        int executionTime;
+        boolean processPreemption;
+        //Check each cycle whether ready queue or priority queue are empty, if both are empty then break the loop
+        while(!readyQueue.isEmpty() || !priorityQueue.isEmpty())
+        {
+            Gantt_Process ganttProcess = new Gantt_Process();
+            newProcessesCount = 0; //Initialize the number of new processes that will be added to priority queue
+            processPreemption = false;
+            executionTime = 0;
+            totalProcessTime = 0;
+
+            update_priorityQueue();
+            update_readyQueue();
+
+            /*If the priority queue is empty then this means the IDLE Task that means the cpu is idle and do nothing
+             *because the priority queue is empty means that we can't add any processes from ready queue to priority queue
+             * because their arrival time is greater than current time
+             */
+            if(priorityQueue.isEmpty())
+            {
+                ganttProcess.processId = 0; // The IDLE task is assumed with id = 0
+                ganttProcess.startTime = currentTime; // The IDLE task begin from the current time
+                currentTime+= readyQueue.get(0).getArrivalTime()-currentTime; //The IDLE Task will continue till the first arrival time in ready queue(sorted)
+                ganttProcess.endTime = currentTime;
+            }
+            else //If the priority queue has processes then it means that cpu can execute them
+            {
+                //The end time if the processes has been executed without preemption
+                totalProcessTime = currentTime + priorityQueue.peek().getBurstTime();
+                for(Process p:readyQueue)
+                {
+                    /*Find the nearest process in the ready queue that satisfy two conditions:
+                      a) Its arrival time is less than the end time of the current process
+                      b) Its priority is greater than the priority of the current process (Higher priority means less value)
+                      If there is a process in ready queue satisfy these conditions, it means that this process can preempt
+                      the current process
+                     */
+                    if(totalProcessTime > p.getArrivalTime() && priorityQueue.peek().getPriority() > p.getPriority())
+                    {
+                        ganttProcess.processId = priorityQueue.peek().getProcessID(); //The gantt process will have ID equal to the current process
+                        ganttProcess.startTime = currentTime; //The start time of gantt process begins with the current time
+                        executionTime = p.getArrivalTime() - currentTime; //The current process will execute till the arrival time of the preempted process
+                        currentTime+= executionTime;
+                        ganttProcess.endTime = currentTime;
+                        priorityQueue.peek().setBurstTime(priorityQueue.peek().getBurstTime()-executionTime); //Calculate the remaining burst time of the current process by decrementing the execution time from burst time
+                        processPreemption = true; //processPreemption happens
+                        break; //Break from the loop
+                    }
+                }
+                // If no preemption occur then this means that the currentprocess can be completely executed
+                if(processPreemption == false)
+                {
+                    ganttProcess.processId = priorityQueue.peek().getProcessID();//The gantt process will have ID equal to the current process
+                    ganttProcess.startTime = currentTime; //The start time of gantt process begins with the current time
+                    currentTime+= priorityQueue.peek().getBurstTime(); //The end time of gantt process will be the burst time of current process (No preemption)
+                    ganttProcess.endTime = currentTime;
+                    priorityQueue.poll(); //Remove the process from the priority queue as it is completely executed
+                }
+            }
+            ganttChart.add(ganttProcess); // add the gantt process to the gantt chart
+        }
+        priorityQueue.clear(); //Clear the priority queue at the end of this preemptive operation
     }
 
     /*
