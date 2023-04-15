@@ -16,6 +16,7 @@ public class GUI_ME {
     public static JLabel labelq;
     public static JLabel labelmsg;
     public static JPanel leftPanel_Two;
+    public static JPanel leftPanel_four = new JPanel(new BorderLayout());
     public static DefaultTableModel model1;
     public static JTable table1;
     public static JScrollPane sp1;
@@ -23,7 +24,7 @@ public class GUI_ME {
 
     public static int process_count = 1;
     public static Scheduler s1;
-    public static ArrayList<Process> readyQueue = new  ArrayList<Process>();
+    public static ArrayList<Process> readyQueue;
 
     public static void DrawGanttChart(ArrayList<Process> q){
 
@@ -34,7 +35,7 @@ public class GUI_ME {
     public static void StaticButtonPressed(){
         String schedular = comboBox.getSelectedObjects()[0].toString();
         int quantum = 1;
-
+        readyQueue = new  ArrayList<Process>();
         
 
         for (int count = 0; count < process_count; count++){
@@ -79,7 +80,9 @@ public class GUI_ME {
                 quantum = (Integer) quantum_field.getValue();
                 System.out.println(quantum);
             }catch(java.text.ParseException e){
-                ; // Do Nothing
+                labelmsg.setText("Error while reading Quantum value - set to 1 (Default)");
+                labelmsg.setForeground(new Color(255, 0, 0));            
+                SwingUtilities.updateComponentTreeUI(mainFrame);
             }
             s1 = new Round_Robin(readyQueue, quantum);
         
@@ -88,6 +91,19 @@ public class GUI_ME {
             s1 = new Priority(readyQueue, false);
             
         }
+
+        s1.execute();
+        s1.sort();
+        for (Gantt_Process p : s1.ganttChart) {
+            System.out.println(p.getProcessId() + " -- " + p.getStartTime() + " -- " + p.getEndTime());
+        }
+        leftPanel_four.removeAll();
+        Gantt g = new Gantt("CPU Schedular", s1.ganttChart, process_count);
+        g.setVisible(true);
+        leftPanel_four.add(g);
+        leftPanel_four.setBackground(new Color(220,204,162));
+        SwingUtilities.updateComponentTreeUI(mainFrame);
+
     }
 
     public static void DynamicButtonPressed(){
@@ -260,10 +276,10 @@ public class GUI_ME {
 
         JPanel panel_right = new JPanel();
         panel_right.setLayout(new BorderLayout());
-        panel_right.setBorder(BorderFactory.createEmptyBorder(40,50,10,90));
+        panel_right.setBorder(BorderFactory.createEmptyBorder(5,50,10,90));
 
         JPanel times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER,90,10));
-        times_panel.setBorder(BorderFactory.createEmptyBorder(300,5,5,5));
+        times_panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
         JPanel waitBox = new JPanel(new BorderLayout());
         JPanel turnTimeBox = new JPanel();
         waitBox.setLayout(new BoxLayout(waitBox,BoxLayout.Y_AXIS));
@@ -300,7 +316,8 @@ public class GUI_ME {
         time_container.add(times_panel);
 
         panel_right.add(sp2,BorderLayout.NORTH);
-        panel_right.add(time_container,BorderLayout.CENTER);
+        panel_right.add(leftPanel_four,BorderLayout.CENTER);
+        panel_right.add(time_container,BorderLayout.SOUTH);
 
 
         //================ COLOR ===================================

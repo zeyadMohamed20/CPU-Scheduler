@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -20,22 +21,24 @@ import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
 
-public class Gantt extends ApplicationFrame {
+public class Gantt extends JPanel {
 
 
-    public static ArrayList<Gantt_Process> ganttChart = new  ArrayList<Gantt_Process>();
-
+    public static ArrayList<Gantt_Process> ganttChart;
+    public static int p_no;
     /**
      * Constructs the demo application.
      *
      * @param title  the frame title.
      */
-    public Gantt(String title, ArrayList<Gantt_Process> gantt) {
-        super(title);
+    public Gantt(String title, ArrayList<Gantt_Process> gantt, int n) {
+        //super(title);
         ganttChart = gantt;
+        p_no = n;
         JPanel chartPanel = createDemoPanel();
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 300));
-        setContentPane(chartPanel);
+        add(chartPanel);
+        //setContentPane(chartPanel);
     }
 
     /**
@@ -56,18 +59,25 @@ public class Gantt extends ApplicationFrame {
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setRangePannable(true);
 
-        String[] p = new String[4];
+        ArrayList<String> p = new ArrayList<String>();
         int count = 1;
         int prev = ganttChart.get(0).getProcessId();
-        p[0] = "P"+prev;
-        for (int i = 1; i < ganttChart.size(); i++) {
+        p.add(0, "P"+prev);
+        for (int i = 0; i < ganttChart.size(); i++) {
+            System.out.println(" /// " + prev + " /// " + ganttChart.get(i).getProcessId());
             if(prev != ganttChart.get(i).getProcessId()){
+                System.out.println("HERE");
                 prev = ganttChart.get(i).getProcessId();
-                p[count] = "P"+ganttChart.get(i).getProcessId();
+                p.add(count, "P"+ganttChart.get(i).getProcessId());
                 count++;
             }
         }
-        SymbolAxis xAxis = new SymbolAxis("Process", p);
+        for (String string : p) {
+            System.out.println(string);
+        }
+        String[] process = new String[count];
+        p.toArray(process);
+        SymbolAxis xAxis = new SymbolAxis("Process", process);
         xAxis.setGridBandsVisible(true);
         plot.setDomainAxis(xAxis);
         XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
@@ -81,7 +91,7 @@ public class Gantt extends ApplicationFrame {
 
     /**
      * Creates a panel for the demo.
-     *
+     * 
      * @return A panel.
      */
     public static JPanel createDemoPanel() {
@@ -131,13 +141,14 @@ public class Gantt extends ApplicationFrame {
         return dataset;
     }
 
+
     public static void main(String[] args) {
         ArrayList<Gantt_Process> gg = new ArrayList<Gantt_Process>();
         Gantt_Process p1 = new Gantt_Process(1,0,3);
         Gantt_Process p2 = new Gantt_Process(2,3,5);
         Gantt_Process p3 = new Gantt_Process(3,5,6);
         Gantt_Process p4 = new Gantt_Process(1,7,8);
-        Gantt_Process p5 = new Gantt_Process(5,8,10);
+        Gantt_Process p5 = new Gantt_Process(4,8,10);
         Gantt_Process p6 = new Gantt_Process(1,10,13);
         gg.add(p5);
         gg.add(p3);
@@ -148,9 +159,9 @@ public class Gantt extends ApplicationFrame {
         gg.add(p4);
 
         Gantt demo = new Gantt(
-                "JFreeChart : XYTaskDatasetDemo1.java", gg);
-        demo.pack();
-        RefineryUtilities.centerFrameOnScreen(demo);
+                "JFreeChart : XYTaskDatasetDemo1.java", gg, 4);
+        //demo.pack();
+        //RefineryUtilities.centerFrameOnScreen(demo);
         demo.setVisible(true);
     }
 
