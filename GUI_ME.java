@@ -17,6 +17,7 @@ public class GUI_ME {
     public static JLabel labelmsg;
     public static JPanel leftPanel_Two;
     public static JPanel leftPanel_four = new JPanel(new BorderLayout());
+    public static JPanel time_container = new JPanel(new BorderLayout());
     public static DefaultTableModel model1;
     public static JTable table1;
     public static JScrollPane sp1;
@@ -51,7 +52,7 @@ public class GUI_ME {
             } catch (Exception e) {
                 labelmsg.setText("Please Complete the process information at row: " + (count+1));
                 labelmsg.setForeground(new Color(255, 0, 0));
-                break;
+                return;
             }
             Process p = new Process(id, arrival, CPU_Time, pri);
 
@@ -101,9 +102,11 @@ public class GUI_ME {
         Gantt g = new Gantt("CPU Schedular", s1.ganttChart, process_count);
         g.setVisible(true);
         leftPanel_four.add(g);
-        leftPanel_four.setBackground(new Color(220,204,162));
+        wait_value.setText(s1.get_averageWaiting()+ " s");
+        turnTime_value.setText(s1.get_averageTurnAround()+ " s");
+        time_container.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
-
+        System.out.println("S" + s1.get_averageWaiting() + " " + s1.get_averageTurnAround());
     }
 
     public static void DynamicButtonPressed(){
@@ -146,10 +149,10 @@ public class GUI_ME {
 
     public static void create_And_Show(){
 
-        Color custom_backcolor = new Color(220,204,162);
-        // Color custom_backcolor = new Color(69,73,74);
+        // Color custom_backcolor = new Color(220,204,162);
+         Color custom_backcolor = new Color(69,73,74);
         // Color custom_backcolor = new Color(17,30,48);
-        //  Color custom_backcolor = new Color(14,32,30);
+        // Color custom_backcolor = new Color(14,32,30);
 
 
         //=================================================================
@@ -164,8 +167,8 @@ public class GUI_ME {
         //============================== LEFT PANEL ================================================
 
         JPanel panel_Left = new JPanel();
-        panel_Left.setLayout(new BorderLayout());
-        panel_Left.setBorder(BorderFactory.createEmptyBorder(10,40,10,10));
+        panel_Left.setLayout(new BoxLayout(panel_Left,BoxLayout.Y_AXIS));
+        panel_Left.setBorder(BorderFactory.createEmptyBorder(10,40,100,10));
 
 
         JPanel panel_Left_Container1 = new JPanel();
@@ -275,11 +278,11 @@ public class GUI_ME {
         //============================== RIGHT PANEL ================================================
 
         JPanel panel_right = new JPanel();
-        panel_right.setLayout(new BorderLayout());
-        panel_right.setBorder(BorderFactory.createEmptyBorder(5,50,10,90));
+        panel_right.setLayout(new BoxLayout(panel_right,BoxLayout.Y_AXIS));
+        panel_right.setBorder(BorderFactory.createEmptyBorder(50,50,100,90));
 
         JPanel times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER,90,10));
-        times_panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        times_panel.setBorder(BorderFactory.createEmptyBorder(20,5,5,5));
         JPanel waitBox = new JPanel(new BorderLayout());
         JPanel turnTimeBox = new JPanel();
         waitBox.setLayout(new BoxLayout(waitBox,BoxLayout.Y_AXIS));
@@ -301,27 +304,38 @@ public class GUI_ME {
         turnTimeBox.add(label4);
         turnTimeBox.add(turnTime_value);
 
+        leftPanel_four.setLayout(new BoxLayout(leftPanel_four,BoxLayout.Y_AXIS));
+
         times_panel.add(waitBox);
         times_panel.add(turnTimeBox);
 
-        JTable process_table = new JTable(2,3);  // 2  is constant but colomn depends on process_num
-        process_table.setFillsViewportHeight(true);
-        process_table.setPreferredScrollableViewportSize(process_table.getPreferredSize());
-        process_table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        JTable queue = new JTable(17,2);  // 2  is constant but colomn depends on process_num
+        queue.setFillsViewportHeight(true);
+        queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
+        queue.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        JScrollPane sp2 = new JScrollPane(process_table);
-        sp2.setPreferredSize(process_table.getPreferredSize());
+        JScrollPane sp2 = new JScrollPane(queue);
+        sp2.setPreferredSize(queue.getPreferredSize());
 
-        JPanel time_container = new JPanel(new BorderLayout());
+        
         time_container.add(times_panel);
+        time_container.setVisible(false);
+        //panel_right.add(sp2,BorderLayout.NORTH);
+        //leftPanel_four.add(time_container);
 
-        panel_right.add(sp2,BorderLayout.NORTH);
-        panel_right.add(leftPanel_four,BorderLayout.CENTER);
-        panel_right.add(time_container,BorderLayout.SOUTH);
+        /*JPanel empty = new JPanel();
+        empty.setLayout(new BorderLayout());
+        empty.setBorder(BorderFactory.createEmptyBorder(15,20,100,20));
+        empty.add(sp2,BorderLayout.CENTER);
+        empty.setSize(sp2.getPreferredSize());*/
+
+        panel_right.add(leftPanel_four);
+        panel_right.add(time_container);
+        panel_right.add(sp2);
 
 
         //================ COLOR ===================================
-
+        leftPanel_four.setBackground(custom_backcolor);
         panel_right.setBackground(custom_backcolor);
         panel_Left.setBackground(custom_backcolor);
         panel_Left_Container1.setBackground(custom_backcolor);
@@ -333,7 +347,7 @@ public class GUI_ME {
         label3.setBackground(custom_backcolor);
         label4.setBackground(custom_backcolor);
         sp1.setBackground(custom_backcolor);
-        sp2.setBackground(custom_backcolor);
+        //sp2.setBackground(custom_backcolor);
         leftPanel_One.setBackground(custom_backcolor);
         leftPanel_Two.setBackground(custom_backcolor);
         leftPanel_three.setBackground(custom_backcolor);
@@ -344,17 +358,19 @@ public class GUI_ME {
         label4.setForeground(Color.BLUE);
         wait_value.setForeground(Color.BLUE);
         turnTime_value.setForeground(Color.BLUE);
+        //empty.setBackground(custom_backcolor);
+        sp2.setBackground(custom_backcolor);
 
 
         // option 2,3,4 only
-        /* 
+        
         label1.setForeground(Color.WHITE);
         label2.setForeground(Color.WHITE);
         label3.setForeground(Color.WHITE);
         label4.setForeground(Color.WHITE);
         wait_value.setForeground(Color.WHITE);
         turnTime_value.setForeground(Color.WHITE);
-*/
+
         //======================== MAIN FRAME ======================================
 
 
