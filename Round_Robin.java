@@ -23,7 +23,7 @@ public class Round_Robin extends  Scheduler
                 if(readyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
                 {
                     NumOfContinue++ ;
-                    if (NumOfContinue == readyQueue.size() )
+                    if (NumOfContinue == readyQueue.size())
                     {
                         Gantt_Process ganttProcess = new Gantt_Process(0, currentTime, readyQueue.get(minArrivalProcessIndex).getArrivalTime());
                         ganttChart.add(ganttProcess);
@@ -33,10 +33,10 @@ public class Round_Robin extends  Scheduler
                 else
                 {
                     //Create gantt process and add it to gantt chart
-                    Gantt_Process ganttProcess = new Gantt_Process(readyQueue.get(currentProcessIndex).getProcessID(), currentTime,  currentTime + quantum);
+                    Gantt_Process ganttProcess = new Gantt_Process(readyQueue.get(currentProcessIndex).getProcessID(), currentTime,  currentTime + ((readyQueue.get(currentProcessIndex).getBurstTime()<quantum)?readyQueue.get(currentProcessIndex).getBurstTime():quantum));
                     ganttChart.add(ganttProcess);
                     //update the current time
-                    currentTime += quantum ;
+                    currentTime += ((readyQueue.get(currentProcessIndex).getBurstTime()<quantum)?readyQueue.get(currentProcessIndex).getBurstTime():quantum) ;
                     readyQueue.get(currentProcessIndex).setBurstTime((readyQueue.get(currentProcessIndex).getBurstTime()-quantum));
                     if ( readyQueue.get(currentProcessIndex).getBurstTime() <= 0 )
                         readyQueue.remove(currentProcessIndex);
