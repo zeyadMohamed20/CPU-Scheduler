@@ -3,7 +3,6 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.awt.Color;
 
 
 public class GUI_ME {
@@ -21,6 +20,7 @@ public class GUI_ME {
     public static DefaultTableModel model1;
     public static JTable table1;
     public static JScrollPane sp1;
+    public static JScrollPane sp2;    
     public static JFrame mainFrame;
 
     public static int process_count = 1;
@@ -105,8 +105,8 @@ public class GUI_ME {
         wait_value.setText(s1.get_averageWaiting()+ " s");
         turnTime_value.setText(s1.get_averageTurnAround()+ " s");
         time_container.setVisible(true);
+        sp2.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
-        System.out.println("S" + s1.get_averageWaiting() + " " + s1.get_averageTurnAround());
     }
 
     public static void DynamicButtonPressed(){
@@ -164,11 +164,17 @@ public class GUI_ME {
         mainFrame.setSize(1400,1000);
 
 
+        //=================================== Fonts ================================================
+
+        Font f = new Font("Arial",Font.PLAIN,14);
+        Font msg = new Font("Arial" ,Font.BOLD,16);
+        Font header = new Font("Serif" ,Font.BOLD,22);
+
         //============================== LEFT PANEL ================================================
 
         JPanel panel_Left = new JPanel();
         panel_Left.setLayout(new BoxLayout(panel_Left,BoxLayout.Y_AXIS));
-        panel_Left.setBorder(BorderFactory.createEmptyBorder(10,40,100,10));
+        panel_Left.setBorder(BorderFactory.createEmptyBorder(10,20,20,20));
 
 
         JPanel panel_Left_Container1 = new JPanel();
@@ -177,14 +183,19 @@ public class GUI_ME {
 
 
         JPanel leftPanel_One = new JPanel();
-        leftPanel_One.setLayout(new FlowLayout());
+        leftPanel_One.setLayout(new BoxLayout(leftPanel_One,BoxLayout.Y_AXIS));
         leftPanel_One.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
+
+        JLabel label0 = new JLabel("Input Panel");
+        label0.setFont(header);
         JLabel label1 = new JLabel("Number of Processes: ");
         labelq = new JLabel("Quantum: ");
         labelmsg = new JLabel();
-        Font msg = new Font("Arial" ,Font.BOLD,18);
 
-        JTextField txt_Field1 = new JTextField(9);
+        JPanel leftPanel_One_1 = new JPanel();
+        leftPanel_One_1.setLayout(new FlowLayout());
+        leftPanel_One_1.setBorder(BorderFactory.createEmptyBorder(20,3,3,3));
+
 
         SpinnerNumberModel model = new SpinnerNumberModel(1,1,100,1);
         SpinnerNumberModel model2 = new SpinnerNumberModel(1,1,100,1);
@@ -192,8 +203,12 @@ public class GUI_ME {
         quantum_field = new JSpinner(model2);
         spinner_field.addChangeListener(e -> ProccessChange());;
 
-        leftPanel_One.add(label1);
-        leftPanel_One.add(spinner_field);
+        leftPanel_One_1.add(label1);
+        leftPanel_One_1.add(spinner_field);
+        leftPanel_One_1.setFont(f);
+
+        leftPanel_One.add(label0);
+        leftPanel_One.add(leftPanel_One_1);
 
 
         leftPanel_Two = new JPanel();
@@ -211,18 +226,17 @@ public class GUI_ME {
 
         panel_Left_Container1.add(leftPanel_One,BorderLayout.NORTH);
         panel_Left_Container1.add(leftPanel_Two,BorderLayout.CENTER);
-
-
-        JPanel panel_Left_Container2 = new JPanel();
-        panel_Left_Container2.setLayout(new BorderLayout());
-        panel_Left_Container2.setBorder(BorderFactory.createEmptyBorder(100,10,10,5));
-
+        
         JPanel leftPanel_three = new JPanel();
         leftPanel_three.setLayout(new BorderLayout());
-        leftPanel_three.setBorder(BorderFactory.createEmptyBorder(10,20,0,10));
+        leftPanel_three.setBorder(BorderFactory.createEmptyBorder(15,20,0,20));
         labelmsg.setFont(msg);
         leftPanel_three.add(labelmsg);
         panel_Left_Container1.add(leftPanel_three,BorderLayout.AFTER_LAST_LINE);
+
+        JPanel panel_Left_Container2 = new JPanel();
+        panel_Left_Container2.setLayout(new BoxLayout(panel_Left_Container2,BoxLayout.Y_AXIS));
+        panel_Left_Container2.setBorder(BorderFactory.createEmptyBorder(0,10,20,10));
 
         model1 = new DefaultTableModel();
         table1 = new JTable(model1);
@@ -257,7 +271,7 @@ public class GUI_ME {
 
         JPanel button_pane = new JPanel();
         button_pane.setLayout(new FlowLayout(FlowLayout.CENTER,50,10));
-        button_pane.setBorder(BorderFactory.createEmptyBorder(200,10,10,10));
+        button_pane.setBorder(BorderFactory.createEmptyBorder(30,10,10,10));
 
         JButton b1 = new JButton("Static Schedule") ;
         JButton b2 = new JButton("Dynamic Schedule");
@@ -273,13 +287,19 @@ public class GUI_ME {
 
 
         panel_Left.add(panel_Left_Container1,BorderLayout.NORTH);
-        panel_Left.add(panel_Left_Container2,BorderLayout.CENTER);
+        panel_Left.add(panel_Left_Container2,BorderLayout.NORTH);
 
         //============================== RIGHT PANEL ================================================
 
         JPanel panel_right = new JPanel();
         panel_right.setLayout(new BoxLayout(panel_right,BoxLayout.Y_AXIS));
-        panel_right.setBorder(BorderFactory.createEmptyBorder(50,50,100,90));
+        panel_right.setBorder(BorderFactory.createEmptyBorder(10,50,100,90));
+
+        JLabel label0_0 = new JLabel("Output Panel");
+        label0_0.setFont(header);
+        JPanel right_label = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        right_label.setBorder(BorderFactory.createEmptyBorder(0,0,5,0));
+        right_label.add(label0_0, BorderLayout.CENTER);
 
         JPanel times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER,90,10));
         times_panel.setBorder(BorderFactory.createEmptyBorder(20,5,5,5));
@@ -309,14 +329,14 @@ public class GUI_ME {
         times_panel.add(waitBox);
         times_panel.add(turnTimeBox);
 
-        JTable queue = new JTable(17,2);  // 2  is constant but colomn depends on process_num
+        JTable queue = new JTable(10,2);  // 2  is constant but colomn depends on process_num
         queue.setFillsViewportHeight(true);
         queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
         queue.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        JScrollPane sp2 = new JScrollPane(queue);
+        sp2 = new JScrollPane(queue);
         sp2.setPreferredSize(queue.getPreferredSize());
-
+        sp2.setVisible(false);
         
         time_container.add(times_panel);
         time_container.setVisible(false);
@@ -329,9 +349,10 @@ public class GUI_ME {
         empty.add(sp2,BorderLayout.CENTER);
         empty.setSize(sp2.getPreferredSize());*/
 
+        panel_right.add(right_label,BorderLayout.PAGE_START);
         panel_right.add(leftPanel_four);
         panel_right.add(time_container);
-        panel_right.add(sp2);
+        panel_right.add(sp2,BorderLayout.CENTER);
 
 
         //================ COLOR ===================================
@@ -349,9 +370,11 @@ public class GUI_ME {
         sp1.setBackground(custom_backcolor);
         //sp2.setBackground(custom_backcolor);
         leftPanel_One.setBackground(custom_backcolor);
+        leftPanel_One_1.setBackground(custom_backcolor);
         leftPanel_Two.setBackground(custom_backcolor);
         leftPanel_three.setBackground(custom_backcolor);
         times_panel.setBackground(custom_backcolor);
+        right_label.setBackground(custom_backcolor);
         waitBox.setBackground(custom_backcolor);
         turnTimeBox.setBackground(custom_backcolor);
         label3.setForeground(Color.BLUE);
@@ -364,6 +387,8 @@ public class GUI_ME {
 
         // option 2,3,4 only
         
+        label0.setForeground(Color.WHITE);
+        label0_0.setForeground(Color.WHITE);
         label1.setForeground(Color.WHITE);
         label2.setForeground(Color.WHITE);
         label3.setForeground(Color.WHITE);
