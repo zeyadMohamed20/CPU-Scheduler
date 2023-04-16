@@ -18,7 +18,16 @@ public class Priority extends  Scheduler
     public Priority(ArrayList<Process> readyQueue, boolean preemptive)
     {
         super(readyQueue, preemptive);
-        priorityQueue = new PriorityQueue<>(Comparator.comparingInt(Process::getPriority));
+        priorityQueue = new PriorityQueue<>((p1, p2) -> {
+            if (p1.getPriority() != p2.getPriority()) {
+                return Integer.compare(p1.getPriority(), p2.getPriority());
+            } else if (p1.getArrivalTime() != p2.getArrivalTime()) {
+                return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
+            } else {
+                return Integer.compare(p1.getProcessID(), p2.getProcessID());
+            }
+        });
+
         currentTime = 0;
         currentProcessIndex = 0;
         ganttChart = new ArrayList<>();
