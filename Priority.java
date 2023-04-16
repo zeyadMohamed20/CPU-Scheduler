@@ -13,13 +13,13 @@ public class Priority extends  Scheduler
 {
     private final PriorityQueue<Process> priorityQueue;
     private int currentTime;
-    private int curentProcessIndex;
+    private int currentProcessIndex;
     public Priority(ArrayList<Process> readyQueue, boolean preemptive)
     {
         super(readyQueue, preemptive);
         priorityQueue = new PriorityQueue<>(Comparator.comparingInt(Process::getPriority));
         currentTime = 0;
-        curentProcessIndex = 0;
+        currentProcessIndex = 0;
         ganttChart = new ArrayList<>();
     }
 
@@ -32,12 +32,12 @@ public class Priority extends  Scheduler
      */
     void update_priorityQueue()
     {
-        for(int i=curentProcessIndex;i<readyQueue.size();i++)
+        for(int i = currentProcessIndex; i<readyQueue.size(); i++)
         {
             if(readyQueue.get(i).getArrivalTime()<= currentTime)
             {
                 priorityQueue.add(readyQueue.get(i));
-                curentProcessIndex++;
+                currentProcessIndex++;
             }
             else /*The ready queue is sorted so the first process that has arrival time greater than current time
                    then all processes after it have arrival time greater than current time, so we break */
@@ -53,7 +53,7 @@ public class Priority extends  Scheduler
     public void non_preemptive_priority()
     {
         //Check each cycle whether ready queue or priority queue are empty, if both are empty then break the loop
-        while(!(curentProcessIndex >= readyQueue.size())  || !priorityQueue.isEmpty())
+        while(!(currentProcessIndex >= readyQueue.size())  || !priorityQueue.isEmpty())
         {
             Gantt_Process ganttProcess = new Gantt_Process();
             update_priorityQueue();
@@ -66,7 +66,7 @@ public class Priority extends  Scheduler
             {
                 ganttProcess.processId = 0; // The IDLE task is assumed with id = 0
                 ganttProcess.startTime = currentTime; // The IDLE task begin from the current time
-                currentTime+= readyQueue.get(curentProcessIndex).getArrivalTime()-currentTime; //The IDLE Task will continue till the first arrival time in ready queue(sorted)
+                currentTime+= readyQueue.get(currentProcessIndex).getArrivalTime()-currentTime; //The IDLE Task will continue till the first arrival time in ready queue(sorted)
                 ganttProcess.endTime = currentTime;
             }
             else //If the priority queue has processes then it means that cpu can execute them
@@ -93,7 +93,7 @@ public class Priority extends  Scheduler
         int executionTime;
         boolean processPreemption;
         //Check each cycle whether ready queue or priority queue are empty, if both are empty then break the loop
-        while(!(curentProcessIndex >= readyQueue.size()) || !priorityQueue.isEmpty())
+        while(!(currentProcessIndex >= readyQueue.size()) || !priorityQueue.isEmpty())
         {
             Gantt_Process ganttProcess = new Gantt_Process();
             processPreemption = false;
@@ -108,14 +108,14 @@ public class Priority extends  Scheduler
             {
                 ganttProcess.processId = 0; // The IDLE task is assumed with id = 0
                 ganttProcess.startTime = currentTime; // The IDLE task begin from the current time
-                currentTime+= readyQueue.get(curentProcessIndex).getArrivalTime()-currentTime; //The IDLE Task will continue till the first arrival time in ready queue(sorted)
+                currentTime+= readyQueue.get(currentProcessIndex).getArrivalTime()-currentTime; //The IDLE Task will continue till the first arrival time in ready queue(sorted)
                 ganttProcess.endTime = currentTime;
             }
             else //If the priority queue has processes then it means that cpu can execute them
             {
                 //The end time if the processes has been executed without preemption
                 totalProcessTime = currentTime + priorityQueue.peek().getBurstTime();
-                for(int i=curentProcessIndex;i<readyQueue.size();i++)
+                for(int i = currentProcessIndex; i<readyQueue.size(); i++)
                 {
                     /*Find the nearest process in the ready queue that satisfy two conditions:
                       a) Its arrival time is less than the end time of the current process
@@ -159,7 +159,7 @@ public class Priority extends  Scheduler
      * process ID, start time, end time
      */
     @Override
-    public ArrayList<Gantt_Process>get_GanttChart()
+    public void get_GanttChart()
     {
         /* Sort the processes according to its arrival time when the type of sort is merge sort to be  stable sort
          * so that if there are multiple processes of same arrival time then process ID will be used to break the tie
@@ -171,6 +171,5 @@ public class Priority extends  Scheduler
         else //Check true preemption so preemptive priority scheduling will be executed
             preemptive_priority();
 
-        return ganttChart; //return the gantt chart
     }
 }
