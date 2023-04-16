@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /***************************************************************************************************************
  * Module: priority Scheduler
  *
@@ -11,6 +9,7 @@ import java.util.ArrayList;
  *****************************************************************************************************************/
 
 import java.util.*;
+
 public class Priority extends  Scheduler
 {
     private final PriorityQueue<Process> priorityQueue;
