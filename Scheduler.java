@@ -57,22 +57,61 @@ public abstract class Scheduler
     }
 
     // Abstract method to get ganttchart from derived class
-    public abstract ArrayList<Gantt_Process>get_GanttChart();
+    public abstract void get_GanttChart();
 
     //Calculate Average Waiting time for any scheduling algorithm (general way)
-    public float get_averageWaiting()
+    public void get_averageWaiting()
     {
-        return averageWaitingTime;
+        float sum =0;
+        int maxId = readyQueue.get(readyQueue.size()-1).getProcessID();
+        int[] waiting= new int[maxId + 1];
+        for(Gantt_Process gantt_process:ganttChart)
+        {
+            if(gantt_process.processId==0)
+                continue;
+            else
+                waiting[gantt_process.processId] = gantt_process.endTime - readyQueue.get(gantt_process.processId-1).getArrivalTime() - readyQueue.get(gantt_process.processId-1).getBurstTime();
+        }
+        for(int i=1;i<waiting.length;i++)
+            sum += waiting[i];
+        averageWaitingTime = sum/(waiting.length-1);
     }
 
     //Calculate Average TurnAround time for any scheduling algorithm (general way)
-    public float get_averageTurnAround()
+    public void get_averageTurnAround()
     {
-        return averageTurnAroundTime;
+        float sum =0;
+        int maxId = readyQueue.get(readyQueue.size()-1).getProcessID();
+        int[] turnAround= new int[maxId + 1];
+        for(Gantt_Process gantt_process:ganttChart)
+        {
+            if(gantt_process.processId==0)
+                continue;
+            else
+                turnAround[gantt_process.processId] = gantt_process.endTime - readyQueue.get(gantt_process.processId-1).getArrivalTime();
+        }
+        for(int i=1;i<turnAround.length;i++)
+            sum +=turnAround[i];
+        averageTurnAroundTime = sum/(turnAround.length-1);
     }
+
+    /*This function is used to revive ready queue after some modification on it when calculating gantt chart
+      The revival is done by summing time slots of same process in gantt chart to calculate its burst time
+     */
+    public void revive_readyQueue()
+    {
+        int maxId = readyQueue.get(readyQueue.size()-1).getProcessID();
+        int[]burst = new int[maxId + 1];
+        for(int i=0;i<ganttChart.size();i++)
+            burst[ganttChart.get(i).processId] += ganttChart.get(i).endTime - ganttChart.get(i).startTime;
+        for(int i=1;i<readyQueue.size();i++)
+            readyQueue.get(i-1).setBurstTime(burst[i]);
+
+    }
+
     //Sorting the ready queue ascending based on some criteria:
     // ID,ARRIVAL_TIME,BURST_TIME,PRIORITY
-    public void sort(SORTING_CRITERIA option)
+    public void sort_readyQueue(SORTING_CRITERIA option)
     {
         Collections.sort(readyQueue, new Comparator<Process>()
         {
@@ -94,14 +133,30 @@ public abstract class Scheduler
         });
 
     }
+    //Sorting ganttchart according to process id
+    public void sort_ganttChart()
+    {
+        Collections.sort(ganttChart, new Comparator<Gantt_Process>()
+        {
+            @Override
+            public int compare(Gantt_Process p1, Gantt_Process p2)
+            {
+                return p1.getProcessId() - p2.getProcessId();
+            }
+        });
+    }
+
     //To execute scheduling algorithm then:
-    // calculate ganttchart fromm drived class and store it into ganttchart attribute
-    // calculate avaerage turnaround and store it into averageTurnAround attribute
-    // calculate avaerage waiting and store it into averageWaiting attribute
+    // calculate ganttchart fromm derived class and store it into ganttchart attribute
+    // calculate average turnaround and store it into averageTurnAround attribute
+    // calculate average waiting and store it into averageWaiting attribute
     public void execute()
     {
-        this.ganttChart = get_GanttChart();
-        this.averageTurnAroundTime = get_averageTurnAround();
-        this.averageWaitingTime = get_averageWaiting();
+        this.get_GanttChart();
+        this.sort_readyQueue(SORTING_CRITERIA.ID);
+        this.sort_ganttChart();
+        this.revive_readyQueue();
+        this.get_averageTurnAround();
+        this.get_averageWaiting();
     }
 }
