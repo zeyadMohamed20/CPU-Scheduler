@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class SJF extends  Scheduler
 {
 	private int currentTime = 0, currentProcessIndex = 0;
+	private ArrayList<Process>myReadyQueue = new ArrayList<Process>();
 	
     public SJF(ArrayList<Process> readyQueue, boolean preemptive)
     {
@@ -21,15 +22,15 @@ public class SJF extends  Scheduler
     {    	    	  	     
     	//If the scheduler used was SJF without preemption
     	if(!preemptionOption)    	
-    		readyQueue.remove(currentProcessIndex);    	
+    		myReadyQueue.remove(currentProcessIndex);    	
     	//If the scheduler used was SJF with preemption
     	else
     	{
     		//Decrement the burst time by 1
-    		if(readyQueue.get(currentProcessIndex).getBurstTime() > 0)
-    			readyQueue.get(currentProcessIndex).setBurstTime(readyQueue.get(currentProcessIndex).getBurstTime() - 1);
-    		if(readyQueue.get(currentProcessIndex).getBurstTime() == 0)
-    			readyQueue.remove(currentProcessIndex);
+    		if(myReadyQueue.get(currentProcessIndex).getBurstTime() > 0)
+    			myReadyQueue.get(currentProcessIndex).setBurstTime(myReadyQueue.get(currentProcessIndex).getBurstTime() - 1);
+    		if(myReadyQueue.get(currentProcessIndex).getBurstTime() == 0)
+    			myReadyQueue.remove(currentProcessIndex);
     	}
     }
     
@@ -40,30 +41,27 @@ public class SJF extends  Scheduler
      * @Description: choose the right process from the ready queue to be executed based on 
      * SJF scheduling.
      */
-    
    public void choose_ProcessIndex()
    {
 	   int i = 0, minBurstProcessIndex = 0;
-	   while(i < readyQueue.size() && readyQueue.get(i).getArrivalTime() <= currentTime)
+	   while(i < myReadyQueue.size() && myReadyQueue.get(i).getArrivalTime() <= currentTime)
 	   {		    
-	   		if(readyQueue.get(i).getBurstTime() < readyQueue.get(minBurstProcessIndex).getBurstTime())
+	   		if(myReadyQueue.get(i).getBurstTime() < myReadyQueue.get(minBurstProcessIndex).getBurstTime())
 	   		{
 	   			minBurstProcessIndex = i;
 	   		}    	
 	   		
 	   		//if the two processes have the same burst time then choose the process that has smaller id
-	   		else if(readyQueue.get(i).getBurstTime() == readyQueue.get(minBurstProcessIndex).getBurstTime())
+	   		else if(myReadyQueue.get(i).getBurstTime() == myReadyQueue.get(minBurstProcessIndex).getBurstTime())
 	   		{	   		
-	   			if(readyQueue.get(minBurstProcessIndex).getProcessID() > readyQueue.get(i).getProcessID())
+	   			if(myReadyQueue.get(minBurstProcessIndex).getProcessID() > myReadyQueue.get(i).getProcessID())
 	   				minBurstProcessIndex = i;
 	   		}
 	   		i++;
 	   }
 	   currentProcessIndex = minBurstProcessIndex;
    }
-   
-   
-   
+  
    
    /*
     * @Function Name: merge_ToGanttChart
@@ -111,33 +109,61 @@ public class SJF extends  Scheduler
 	   return myGanttProcess;		
    }
    
+   
+   
+   /*
+    * @Function Name: ready_QueueDeepClone
+    * 
+    * @return: ArrayList<Process>
+    * 
+    * @Description: Clone the readyQueue deeply not to modify the original one
+    */
+   private ArrayList<Process> ready_QueueDeepClone()
+   {
+   	for(int i = 0; i < readyQueue.size(); i++)
+   	{
+   		Process myProcess = new Process();
+   		myProcess.setArrivalTime(readyQueue.get(i).getArrivalTime());
+   		myProcess.setBurstTime(readyQueue.get(i).getBurstTime());
+   		myProcess.setPriority(readyQueue.get(i).getPriority());
+   		myProcess.setProcessID(readyQueue.get(i).getProcessID());
+   		myReadyQueue.add(myProcess);
+   	}
+   	return myReadyQueue;
+   }
+   
+   
+   
     
     @Override
     public ArrayList<Gantt_Process>get_GanttChart()
     {
     	ganttChart = new ArrayList<Gantt_Process>();
     	//sorting readyQueue based on the arrival time
-    	sort(SORTING_CRITERIA.ARRIVAL_TIME);  	    	
+    	sort(SORTING_CRITERIA.ARRIVAL_TIME);
+    	
+    	this.ready_QueueDeepClone();
+    	
     	//If the used scheduler was SJF without preemption
         if(preemptive == false )
         {
-        	while(!readyQueue.isEmpty())
+        	while(!myReadyQueue.isEmpty())
         	{        		        	
             	choose_ProcessIndex(); 
             	//If the arrival time of the process is greater than the current time, then add ideal task
-            	if(readyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
+            	if(myReadyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
             	{
-            		Gantt_Process ganttProcess = new Gantt_Process(0, currentTime, readyQueue.get(currentProcessIndex).getArrivalTime());
+            		Gantt_Process ganttProcess = new Gantt_Process(0, currentTime, myReadyQueue.get(currentProcessIndex).getArrivalTime());
             		ganttChart.add(ganttProcess);
-            		currentTime = readyQueue.get(currentProcessIndex).getArrivalTime();
+            		currentTime = myReadyQueue.get(currentProcessIndex).getArrivalTime();
             	}
             	else
             	{
             		//Create gantt process and add it to gantt chart
-                	Gantt_Process ganttProcess = new Gantt_Process(readyQueue.get(currentProcessIndex).getProcessID(), currentTime, currentTime + readyQueue.get(currentProcessIndex).getBurstTime());
+                	Gantt_Process ganttProcess = new Gantt_Process(myReadyQueue.get(currentProcessIndex).getProcessID(), currentTime, currentTime + myReadyQueue.get(currentProcessIndex).getBurstTime());
                 	ganttChart.add(ganttProcess);
                 	//update the current time
-                	currentTime += readyQueue.get(currentProcessIndex).getBurstTime();
+                	currentTime += myReadyQueue.get(currentProcessIndex).getBurstTime();
                 	//update the readyQueue by eliminating the executed time of the process from the burst time
                 	update_ReadyQueue(currentProcessIndex, preemptive);	
             	}            	            	         
@@ -150,11 +176,11 @@ public class SJF extends  Scheduler
         	//This is array list to add gantt processes in it, but each one has 1 sec time slice
         	ArrayList<Gantt_Process>tempGanttChart = new ArrayList<Gantt_Process>();
         	
-        	while(!readyQueue.isEmpty())
+        	while(!myReadyQueue.isEmpty())
         	{
         		choose_ProcessIndex();
             	//If the arrival time of the process is greater than the current time, then add ideal task
-            	if(readyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
+            	if(myReadyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
             	{        		     
             		//add temp gantt process of time slice 1 sec to temp gant chart 
         			Gantt_Process tempGanttProcess = new Gantt_Process(0, currentTime, currentTime + 1);
@@ -164,7 +190,7 @@ public class SJF extends  Scheduler
             	else
             	{
             		//Create gantt process and add it to gantt chart
-                	Gantt_Process tempGanttProcess = new Gantt_Process(readyQueue.get(currentProcessIndex).getProcessID(), currentTime, currentTime + 1);
+                	Gantt_Process tempGanttProcess = new Gantt_Process(myReadyQueue.get(currentProcessIndex).getProcessID(), currentTime, currentTime + 1);
                 	tempGanttChart.add(tempGanttProcess);
                 	//update the current time
                 	currentTime ++;
@@ -177,3 +203,4 @@ public class SJF extends  Scheduler
         return ganttChart;
     }
 }
+
