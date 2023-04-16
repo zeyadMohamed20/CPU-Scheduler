@@ -10,36 +10,42 @@ public class Round_Robin extends  Scheduler
     @Override
     public ArrayList<Gantt_Process>get_GanttChart()
     {
+        ArrayList<Process> Queue;
+        Queue = new ArrayList<Process>() ;
         ganttChart = new ArrayList<Gantt_Process>();
         //sorting readyQueue based on the arrival time
         sort(SORTING_CRITERIA.ARRIVAL_TIME);
         int currentTime = 0 ;
         int NumOfContinue = 0 ;
         int minArrivalProcessIndex = 0;
-        while(!readyQueue.isEmpty())
+        for(int currentProcessIndex = 0 ; currentProcessIndex < readyQueue.size(); currentProcessIndex++)
         {
-            for(int currentProcessIndex = 0 ; currentProcessIndex < readyQueue.size(); currentProcessIndex++)
+            Queue.add(readyQueue.get(currentProcessIndex)) ;
+        }
+        while(!Queue.isEmpty())
+        {
+            for(int currentProcessIndex = 0 ; currentProcessIndex < Queue.size(); currentProcessIndex++)
             {
-                if(readyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
+                if(Queue.get(currentProcessIndex).getArrivalTime() > currentTime)
                 {
                     NumOfContinue++ ;
-                    if (NumOfContinue == readyQueue.size())
+                    if (NumOfContinue == Queue.size())
                     {
-                        Gantt_Process ganttProcess = new Gantt_Process(0, currentTime, readyQueue.get(minArrivalProcessIndex).getArrivalTime());
+                        Gantt_Process ganttProcess = new Gantt_Process(0, currentTime, Queue.get(minArrivalProcessIndex).getArrivalTime());
                         ganttChart.add(ganttProcess);
-                        currentTime = readyQueue.get(minArrivalProcessIndex).getArrivalTime();
+                        currentTime = Queue.get(minArrivalProcessIndex).getArrivalTime();
                     }
                 }
                 else
                 {
                     //Create gantt process and add it to gantt chart
-                    Gantt_Process ganttProcess = new Gantt_Process(readyQueue.get(currentProcessIndex).getProcessID(), currentTime,  currentTime + ((readyQueue.get(currentProcessIndex).getBurstTime()<quantum)?readyQueue.get(currentProcessIndex).getBurstTime():quantum));
+                    Gantt_Process ganttProcess = new Gantt_Process(Queue.get(currentProcessIndex).getProcessID(), currentTime,  currentTime + ((Queue.get(currentProcessIndex).getBurstTime()<quantum)?Queue.get(currentProcessIndex).getBurstTime():quantum));
                     ganttChart.add(ganttProcess);
                     //update the current time
-                    currentTime += ((readyQueue.get(currentProcessIndex).getBurstTime()<quantum)?readyQueue.get(currentProcessIndex).getBurstTime():quantum) ;
-                    readyQueue.get(currentProcessIndex).setBurstTime((readyQueue.get(currentProcessIndex).getBurstTime()-quantum));
-                    if ( readyQueue.get(currentProcessIndex).getBurstTime() <= 0 )
-                        readyQueue.remove(currentProcessIndex);
+                    currentTime += ((Queue.get(currentProcessIndex).getBurstTime()<quantum)?Queue.get(currentProcessIndex).getBurstTime():quantum) ;
+                    Queue.get(currentProcessIndex).setBurstTime((Queue.get(currentProcessIndex).getBurstTime()-quantum));
+                    if ( Queue.get(currentProcessIndex).getBurstTime() <= 0 )
+                        Queue.remove(currentProcessIndex);
                     NumOfContinue = 0;
                 }
             }
