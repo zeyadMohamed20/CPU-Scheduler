@@ -50,65 +50,44 @@ public class FCFS extends  Scheduler
          merge = new ArrayList<Gantt_Process>();
          ganttChart = new ArrayList<Gantt_Process>();
      
-         sort(SORTING_CRITERIA.valueOf("ARRIVAL_TIME"));
-        int c=0;
-        int cumv1 = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
-         int cumv2 = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
-         int cumv3 = readyQueue.get(0).getBurstTime()+readyQueue.get(0).getArrivalTime();
-        if(readyQueue.get(0).getArrivalTime() > 0){
-            IDLE.add(new Gantt_Process(0,0, readyQueue.get(0).getArrivalTime()));
-            ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),readyQueue.get(0).getArrivalTime(),cumv1));
-             for (int i = 1; i < readyQueue.size(); i++) 
-             {
-                 c = readyQueue.get(i-1).getArrivalTime()+readyQueue.get(i-1).getBurstTime();
-                 
-                 if(readyQueue.get(i).getArrivalTime()> c)
-                 {
-                     IDLE.add(new Gantt_Process(0,c,readyQueue.get(i).getArrivalTime()));
-                     
-                     cumv1 = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv1 ,readyQueue.get(i).getBurstTime()+ cumv1));
-                   
-                    
-                 }else if(readyQueue.get(i).getArrivalTime() == c){
-                     cumv3 = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv3 ,readyQueue.get(i).getBurstTime()+ cumv3));
-                 }
-                 else{
-                     cumv2 = ganttChart.get(i-1).getEndTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv2,readyQueue.get(i).getBurstTime()+ cumv2));
-                  
-
-                 }
-
-             }
+        sort(SORTING_CRITERIA.valueOf("ARRIVAL_TIME"));
+        int a1 = 0;
+        int a2 = readyQueue.get(0).getArrivalTime();
+        int a3 =  a2+readyQueue.get(0).getBurstTime();
+        
+        if(a2 > a1){
+            IDLE.add(new Gantt_Process(0, a1, a2));
+            ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),a2,a3));
+            for (int i = 1; i < readyQueue.size(); i++) {
+                a1 = ganttChart.get(i-1).getEndTime();
+                a2 = readyQueue.get(i).getArrivalTime();
+      
+                if(a2 > a1){
+                    IDLE.add(new Gantt_Process(0, a1, a2));
+                    ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(), a2, a2+readyQueue.get(i).getBurstTime())); 
+                }else{
+                   ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(), a3, a3+readyQueue.get(i).getBurstTime())); 
+                
+                }   
+                 a3 = ganttChart.get(i).getEndTime();
+            }
         }else{
-              ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),readyQueue.get(0).getArrivalTime(),cumv1));
-             for (int i = 1; i < readyQueue.size(); i++) 
-             {
-                 c = readyQueue.get(i-1).getArrivalTime()+readyQueue.get(i-1).getBurstTime();
-                 
-                 if(readyQueue.get(i).getArrivalTime()> c)
-                 {
-                     IDLE.add(new Gantt_Process(0,c,readyQueue.get(i).getArrivalTime()));
-                     
-                     cumv1 = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv1 ,readyQueue.get(i).getBurstTime()+ cumv1));
-                   
-                    
-                 }else if(readyQueue.get(i).getArrivalTime() == c){
-                     cumv3 = readyQueue.get(i).getArrivalTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv3 ,readyQueue.get(i).getBurstTime()+ cumv3));
-                 }
-                 else{
-                     cumv2 = ganttChart.get(i-1).getEndTime();
-                     ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(),cumv2,readyQueue.get(i).getBurstTime()+ cumv2));
-                  
-
-                 }
-
-             }
+            ganttChart.add(new Gantt_Process(readyQueue.get(0).getProcessID(),a2,a3));
+            for (int i = 1; i < readyQueue.size(); i++) {
+                a1 = ganttChart.get(i-1).getEndTime();
+                a2 = readyQueue.get(i).getArrivalTime();
+       
+                if(a2 > a1){
+                    IDLE.add(new Gantt_Process(0, a1, a2));
+                    ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(), a2, a2+readyQueue.get(i).getBurstTime())); 
+                }else{ 
+                   ganttChart.add(new Gantt_Process(readyQueue.get(i).getProcessID(), a3, a3+readyQueue.get(i).getBurstTime())); 
+                }  
+               a3 = ganttChart.get(i).getEndTime();
+            }
         }
+       
+ 
         for (int i = 0; i < IDLE.size(); i++) {
             merge.add(IDLE.get(i));
             
@@ -121,6 +100,7 @@ public class FCFS extends  Scheduler
         return merge;
     }
     
+   
 
 }
     
