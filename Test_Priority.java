@@ -39,7 +39,7 @@ public class Test_Priority
             i++;
         }
         Scheduler s1 = new Priority(processes, preemptionOption);
-        ArrayList<Gantt_Process>ganttprocesses = s1.get_GanttChart();
+        ArrayList<Gantt_Process>ganttprocesses = s1.ganttChart;
         i = 0;
         System.out.println("\n***GanttChart***");
         while(i < ganttprocesses.size())

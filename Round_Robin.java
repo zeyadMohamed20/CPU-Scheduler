@@ -8,8 +8,8 @@ public class Round_Robin extends  Scheduler
     }
 
     @Override
-    public ArrayList<Gantt_Process>get_GanttChart()
+    public void get_GanttChart()
     {
-        return ganttChart;
+        return ;
     }
 }
