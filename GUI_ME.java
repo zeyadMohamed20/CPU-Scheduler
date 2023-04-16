@@ -58,7 +58,7 @@ public class GUI_ME {
 
             readyQueue.add(p);
             labelmsg.setText("Data OK - Schedular is running...");
-            labelmsg.setForeground(new Color(0, 0, 255));
+            //labelmsg.setForeground(new Color(0, 0, 255));
           }
 
 
@@ -71,7 +71,7 @@ public class GUI_ME {
 
             s1 = new SJF(readyQueue, false);
           
-        }else if(schedular == "SJF_Non Preemptive"){
+        }else if(schedular == "SJF_Non_Preemptive"){
 
             s1 = new SJF(readyQueue, true);
             
@@ -87,14 +87,18 @@ public class GUI_ME {
             }
             s1 = new Round_Robin(readyQueue, quantum);
         
-        }else if(schedular == "Priority"){
+        }else if(schedular == "Priority_Non_Preemptive"){
 
             s1 = new Priority(readyQueue, false);
             
+        }else if(schedular == "Priority_Preemptive"){
+
+            s1 = new Priority(readyQueue, true);
+
         }
 
         s1.execute();
-        s1.sort();
+        s1.sort_ganttChart();
         for (Gantt_Process p : s1.ganttChart) {
             System.out.println(p.getProcessId() + " -- " + p.getStartTime() + " -- " + p.getEndTime());
         }
@@ -102,8 +106,8 @@ public class GUI_ME {
         Gantt g = new Gantt("CPU Schedular", s1.ganttChart, process_count);
         g.setVisible(true);
         leftPanel_four.add(g);
-        wait_value.setText(s1.get_averageWaiting()+ " s");
-        turnTime_value.setText(s1.get_averageTurnAround()+ " s");
+        wait_value.setText(s1.averageWaitingTime+ " s");
+        turnTime_value.setText(s1.averageTurnAroundTime+ " s");
         time_container.setVisible(true);
         sp2.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -215,7 +219,7 @@ public class GUI_ME {
         leftPanel_Two.setLayout(new FlowLayout());
         leftPanel_Two.setBorder(BorderFactory.createEmptyBorder(3,3,3,3));
         JLabel label2 = new JLabel("Scheduler Type: ");
-        String [] schedule_Options = {"--Choose Schedular--", "FCFS","SJF_Preemptive", "SJF_Non Preemptive","Round_Robin", "Priority"};
+        String [] schedule_Options = {"--Choose Schedular--", "FCFS","SJF_Preemptive", "SJF_Non_Preemptive","Round_Robin", "Priority_Non_Preemptive", "Priority_Preemptive"};
         comboBox = new JComboBox<String>(schedule_Options);
 
         comboBox.addActionListener(e -> SchedulerChange());
@@ -285,9 +289,9 @@ public class GUI_ME {
         panel_Left_Container2.add(sp1,BorderLayout.NORTH);
         panel_Left_Container2.add(button_pane,BorderLayout.CENTER);
 
-
+        
         panel_Left.add(panel_Left_Container1,BorderLayout.NORTH);
-        panel_Left.add(panel_Left_Container2,BorderLayout.NORTH);
+        panel_Left.add(panel_Left_Container2,BorderLayout.CENTER);
 
         //============================== RIGHT PANEL ================================================
 
@@ -393,6 +397,7 @@ public class GUI_ME {
         label2.setForeground(Color.WHITE);
         label3.setForeground(Color.WHITE);
         label4.setForeground(Color.WHITE);
+        labelmsg.setForeground(Color.WHITE);
         wait_value.setForeground(Color.WHITE);
         turnTime_value.setForeground(Color.WHITE);
 

@@ -8,7 +8,7 @@ public class SJF extends  Scheduler
     }
 
     @Override
-    public ArrayList<Gantt_Process>get_GanttChart()
+    public void get_GanttChart()
     {
         if(preemptive == false )
         {
@@ -16,6 +16,6 @@ public class SJF extends  Scheduler
         else if(preemptive == true)
         {
         }
-        return ganttChart;
+        return ;
     }
 }
