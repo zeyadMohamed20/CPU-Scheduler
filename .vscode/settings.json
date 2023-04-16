@@ -1,0 +1,16 @@
+{
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.project.referencedLibraries": {
+        "include": [
+            "lib/**/*.jar",
+            "c:\\jfreechart-1.0.19\\lib\\jcommon-1.0.23.jar",
+            "c:\\jfreechart-1.0.19\\lib\\jfreechart-1.0.19.jar"
+        ],
+        "exclude": [
+            "c:\\jfreechart-1.0.19\\lib\\jcommon-1.0.23.jar"
+        ]
+    },
+    "java.project.sourcePaths": [
+        "."
+    ]
+}
