@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.io.* ;
+import java.util.* ;
 
 public class Round_Robin extends  Scheduler
 {
@@ -10,7 +12,8 @@ public class Round_Robin extends  Scheduler
     @Override
     public ArrayList<Gantt_Process>get_GanttChart()
     {
-        int currentTime = 0 , NumOfContinue = 0 , minArrivalProcessIndex = 0 , flag = 0;
+        Vector<Integer> flag2 = new Vector<Integer>() ;
+        int currentTime = 0 , NumOfContinue = 0 , minArrivalProcessIndex = 0 , flag = 0 ,size = readyQueue.size();
         ganttChart = new ArrayList<Gantt_Process>();
         //sorting readyQueue based on the arrival time
         sort(SORTING_CRITERIA.ARRIVAL_TIME) ;
@@ -38,12 +41,21 @@ public class Round_Robin extends  Scheduler
                     readyQueue.get(currentProcessIndex).setBurstTime((readyQueue.get(currentProcessIndex).getBurstTime()-quantum));
                     if ( readyQueue.get(currentProcessIndex).getBurstTime() <= 0 )
                     {
-                        readyQueue.add(readyQueue.get(currentProcessIndex));
-                        readyQueue.remove(currentProcessIndex);
-                        flag++;
+                        flag2.add(currentProcessIndex) ;
                     }
-                    NumOfContinue = 0;
+                    NumOfContinue = 0 ;
                 }
+            }
+            if(!flag2.isEmpty())
+            {
+                for(int i=0 ; i<flag2.size() ; i++)
+                {
+                    int x = flag2.get(i);
+                    readyQueue.add(readyQueue.get(flag2.get(i)));
+                    readyQueue.remove(x);
+                    flag++;
+                }
+                flag2.clear();
             }
         }
             return ganttChart;
