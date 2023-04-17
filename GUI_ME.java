@@ -3,7 +3,6 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Set;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -26,23 +25,22 @@ public class GUI_ME {
     public static JFrame mainFrame;
 
     public static int process_count = 1;
-    public static int total = 0;
+    public static Integer[] a = new Integer[4];
     public static int next = 1;
     public static Scheduler s1;
     public static ArrayList<Process> readyQueue;
     public static ArrayList<Gantt_Process> DynamicQueue = new ArrayList<Gantt_Process>(0);
-    private static Timer timer = null;
+    public static Timer timer = null;
 
     public static boolean get_data() {
         readyQueue = new ArrayList<Process>();
 
         for (int count = 0; count < process_count; count++) {
-            int id = 0; // Process ID
-            int arrival = 0; // Arrival Time
-            int CPU_Time = 0; // CPU Burst Time
-            int pri = 0; // Priority
+            int id = count + 1;     // Process ID
+            int arrival = 0;        // Arrival Time
+            int CPU_Time = 0;       // CPU Burst Time
+            int pri = 0;            // Priority
             try {
-                id = Integer.valueOf((String) table1.getValueAt(count, 0));
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
                 pri = Integer.valueOf((String) table1.getValueAt(count, 3)) == null ? 5
@@ -217,10 +215,13 @@ public class GUI_ME {
         } catch (java.text.ParseException e) {
             ; // Do Nothing
         }
-        for (int i = table1.getRowCount(); i <= process_count; i++) {
-            model1.addRow(new Integer[4]);
+        for (int i = table1.getRowCount(); i < process_count; i++) {
+            a[0]++;
+            model1.addRow(a);
+            model1.setValueAt(a[0], a[0]-1, 0);
+            table1.setValueAt(a[0], a[0]-1, 0);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
-            sp1.setPreferredSize(table1.getPreferredSize());
+            sp1.setPreferredSize(new Dimension(600, (a[0]+1)*table1.getRowHeight()));
         }
 
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -320,8 +321,9 @@ public class GUI_ME {
         model1.addColumn("Arrival Time");
         model1.addColumn("CPU Burst Time");
         model1.addColumn("Priority");
-        model1.addRow(new Integer[4]);
-        model1.addRow(new Integer[4]);
+        a[0] = 1;
+        model1.addRow(a);
+        table1.setValueAt(a[0], a[0]-1, 0);
 
         /*
          * table1 = new JTable(10,4);
@@ -338,12 +340,11 @@ public class GUI_ME {
          * header.repaint();
          */
         table1.setRowHeight(20);
-        ;
         table1.setFillsViewportHeight(true);
         table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         sp1 = new JScrollPane(table1);
-        sp1.setPreferredSize(table1.getPreferredSize());
+        sp1.setPreferredSize(new Dimension(600, table1.getRowHeight()*2));
 
         JPanel button_pane = new JPanel();
         button_pane.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
