@@ -133,17 +133,21 @@ public abstract class Scheduler
         });
 
     }
-    //Sorting ganttchart according to process id
-    public void sort_ganttChart()
+    public void break_ganttChart()
     {
-        Collections.sort(ganttChart, new Comparator<Gantt_Process>()
+        int currentIndex = 0; // the current index in the ArrayList
+
+        while (currentIndex < ganttChart.size())
         {
-            @Override
-            public int compare(Gantt_Process p1, Gantt_Process p2)
+            Gantt_Process process = ganttChart.get(currentIndex);
+            for (int time = process.getStartTime(); time < process.getEndTime(); time++)
             {
-                return p1.getProcessId() - p2.getProcessId();
+                Gantt_Process newProcess = new Gantt_Process(process.processId, time, time+1);
+                ganttChart.add(currentIndex, newProcess);
+                currentIndex++; // move the index to the next position
             }
-        });
+            ganttChart.remove(currentIndex);
+        }
     }
 
     //To execute scheduling algorithm then:
@@ -153,8 +157,8 @@ public abstract class Scheduler
     public void execute()
     {
         this.get_GanttChart();
+        this.break_ganttChart();
         this.sort_readyQueue(SORTING_CRITERIA.ID);
-        this.sort_ganttChart();
         this.revive_readyQueue();
         this.get_averageTurnAround();
         this.get_averageWaiting();
