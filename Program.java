@@ -35,9 +35,9 @@ public class Program {
                     processes.get(i).getBurstTime());
             i++;
         }
-
-        Round_Robin omar = new Round_Robin(processes, quantam);
-        ArrayList<Gantt_Process> ganttprocesses = omar.get_GanttChart();
+		Scheduler omar = new Round_Robin(processes, quantam);
+        s1.execute();
+        ArrayList<Gantt_Process> ganttprocesses = omar.ganttChart;
 
         i = 0;
         System.out.println("\n***GanttChart***");

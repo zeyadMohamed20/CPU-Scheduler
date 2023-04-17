@@ -8,12 +8,12 @@ public class Round_Robin extends  Scheduler
     }
 
     @Override
-    public ArrayList<Gantt_Process>get_GanttChart()
+    public void get_GanttChart()
     {
         int currentTime = 0 , NumOfContinue = 0 , minArrivalProcessIndex = 0 , flag = 0;
         ganttChart = new ArrayList<Gantt_Process>();
         //sorting readyQueue based on the arrival time
-        sort(SORTING_CRITERIA.ARRIVAL_TIME) ;
+        sort_readyQueue(SORTING_CRITERIA.ARRIVAL_TIME); ;
         while(readyQueue.size()!=flag)
         {
             for(int currentProcessIndex = 0 ; currentProcessIndex < (readyQueue.size()-flag); currentProcessIndex++)
@@ -46,6 +46,5 @@ public class Round_Robin extends  Scheduler
                 }
             }
         }
-            return ganttChart;
     }
 }
