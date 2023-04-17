@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.JPanel;
-import javax.swing.JFrame;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
@@ -17,8 +16,6 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.gantt.XYTaskDataset;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
 
 
 public class Gantt extends JPanel {
@@ -26,6 +23,9 @@ public class Gantt extends JPanel {
 
     public static ArrayList<Gantt_Process> ganttChart;
     public static int p_no;
+    public static int count;
+    public static String[] process;
+
     /**
      * Constructs the demo application.
      *
@@ -35,6 +35,13 @@ public class Gantt extends JPanel {
         //super(title);
         ganttChart = gantt;
         p_no = n;
+
+
+        process = new String[n+1];
+        for (int i = 0; i <= n; i++) {
+            process[i] = "P"+i;
+        }
+
         JPanel chartPanel = createDemoPanel();
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 300));
         add(chartPanel);
@@ -58,25 +65,6 @@ public class Gantt extends JPanel {
 
         XYPlot plot = (XYPlot) chart.getPlot();
         plot.setRangePannable(true);
-
-        ArrayList<String> p = new ArrayList<String>();
-        int count = 1;
-        int prev = ganttChart.get(0).getProcessId();
-        p.add(0, "P"+prev);
-        for (int i = 0; i < ganttChart.size(); i++) {
-            System.out.println(" /// " + prev + " /// " + ganttChart.get(i).getProcessId());
-            if(prev != ganttChart.get(i).getProcessId()){
-                System.out.println("HERE");
-                prev = ganttChart.get(i).getProcessId();
-                p.add(count, "P"+ganttChart.get(i).getProcessId());
-                count++;
-            }
-        }
-        for (String string : p) {
-            System.out.println(string);
-        }
-        String[] process = new String[count];
-        p.toArray(process);
         SymbolAxis xAxis = new SymbolAxis("Process", process);
         xAxis.setGridBandsVisible(true);
         plot.setDomainAxis(xAxis);
@@ -117,26 +105,20 @@ public class Gantt extends JPanel {
      */
     private static TaskSeriesCollection createTasks() {
         TaskSeriesCollection dataset = new TaskSeriesCollection();
-        TaskSeries s1 = new TaskSeries("P"+ganttChart.get(0).processId);
-        Task T = new Task("P"+ganttChart.get(0).processId, new SimpleTimePeriod(ganttChart.get(0).startTime, ganttChart.get(0).endTime));
-        int old = ganttChart.get(0).processId;
-        for (int i = 1; i < ganttChart.size()+1; i++) {
-            if(i==ganttChart.size()){
-                s1.add(T);
-                dataset.add(s1);
-                break;
-            }
-            if(old == ganttChart.get(i).processId){
-                s1.add(new Task("P"+i+ganttChart.get(i).processId, new SimpleTimePeriod(ganttChart.get(i).startTime, ganttChart.get(i).endTime)));
-            }else{
-                s1.add(T);
-                dataset.add(s1);
-                old = ganttChart.get(i).processId;
-                s1 = new TaskSeries("P"+ganttChart.get(i).processId);
-                T = new Task("P"+ganttChart.get(i).processId, new SimpleTimePeriod(ganttChart.get(i).startTime, ganttChart.get(i).endTime));
-            }
-        }
 
+        TaskSeries[] ss = new TaskSeries[p_no+1];
+
+        for (int i = 0; i<=p_no; i++)
+            ss[i] = new TaskSeries("P"+i);
+        
+
+        for (int i = 0; i < ganttChart.size(); i++)
+            ss[ganttChart.get(i).processId].add(new Task("P"+i+ganttChart.get(i).processId, new SimpleTimePeriod(ganttChart.get(i).startTime, ganttChart.get(i).endTime)));
+        
+
+        for (TaskSeries taskSeries : ss)
+            dataset.add(taskSeries);
+        
 
         return dataset;
     }

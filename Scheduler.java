@@ -154,7 +154,7 @@ public abstract class Scheduler
     {
         this.get_GanttChart();
         this.sort_readyQueue(SORTING_CRITERIA.ID);
-        this.sort_ganttChart();
+        //this.sort_ganttChart();
         this.revive_readyQueue();
         this.get_averageTurnAround();
         this.get_averageWaiting();
