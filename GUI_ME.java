@@ -8,29 +8,29 @@ import java.awt.event.ActionEvent;
 
 public class GUI_ME {
 
-    public static JLabel turnTime_value;
-    public static JLabel wait_value;
-    public static JComboBox<String> comboBox;
-    public static JSpinner spinner_field;
-    public static JSpinner quantum_field;
-    public static JLabel labelq;
-    public static JLabel labelmsg;
-    public static JPanel leftPanel_Two;
-    public static JPanel leftPanel_four = new JPanel(new BorderLayout());
-    public static JPanel time_container = new JPanel(new BorderLayout());
-    public static DefaultTableModel model1;
-    public static JTable table1;
-    public static JScrollPane sp1;
-    public static JScrollPane sp2;
-    public static JFrame mainFrame;
+    protected static JLabel turnTime_value;
+    protected static JLabel wait_value;
+    protected static JComboBox<String> comboBox;
+    protected static JSpinner spinner_field;
+    protected static JSpinner quantum_field;
+    protected static JLabel labelq;
+    protected static JLabel labelmsg;
+    protected static JPanel leftPanel_Two;
+    protected static JPanel leftPanel_four = new JPanel(new BorderLayout());
+    protected static JPanel times_panel;
+    protected static DefaultTableModel model1;
+    protected static JTable table1;
+    protected static JScrollPane sp1;
+    protected static JScrollPane sp2;
+    protected static JFrame mainFrame;
 
-    public static int process_count = 1;
-    public static Integer[] a = new Integer[4];
-    public static int next = 1;
-    public static Scheduler s1;
-    public static ArrayList<Process> readyQueue;
-    public static ArrayList<Gantt_Process> DynamicQueue = new ArrayList<Gantt_Process>(0);
-    public static Timer timer = null;
+    protected static int process_count = 1;
+    protected static Integer[] a = new Integer[4];
+    protected static int next = 1;
+    protected static Scheduler s1;
+    protected static ArrayList<Process> readyQueue;
+    protected static ArrayList<Gantt_Process> DynamicQueue = new ArrayList<Gantt_Process>(0);
+    protected static Timer timer = null;
 
     public static boolean get_data() {
         readyQueue = new ArrayList<Process>();
@@ -41,6 +41,8 @@ public class GUI_ME {
             int CPU_Time = 0;       // CPU Burst Time
             int pri = 0;            // Priority
             try {
+                int temp = Integer.valueOf((String) table1.getValueAt(count, 0));
+                id = (temp <= process_count)?temp:id;
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
                 pri = Integer.valueOf((String) table1.getValueAt(count, 3)) == null ? 5
@@ -111,7 +113,7 @@ public class GUI_ME {
         leftPanel_four.add(g);
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
-        time_container.setVisible(true);
+        times_panel.setVisible(true);
         sp2.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
@@ -119,6 +121,8 @@ public class GUI_ME {
     public static void DynamicButtonPressed() {
         next = 0;
         DynamicQueue.removeAll(DynamicQueue);
+        times_panel.setVisible(false);
+        sp2.setVisible(false);
 
         timer = new Timer(2000, new Dynamic_Gantt());
         timer.setRepeats(true);
@@ -169,7 +173,6 @@ public class GUI_ME {
         s1.execute();
 
         DynamicQueue.addAll(s1.ganttChart.subList(0, 1));
-        //ready.removeAll(ready);
 
         leftPanel_four.removeAll();
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
@@ -177,7 +180,6 @@ public class GUI_ME {
         leftPanel_four.add(g);
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
-        time_container.setVisible(true);
         sp2.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
@@ -186,6 +188,7 @@ public class GUI_ME {
     public static void repeat(){
         if (next == s1.ganttChart.size()-1) {
             timer.stop();
+            times_panel.setVisible(true);
         }
         leftPanel_four.removeAll();
         DynamicQueue.addAll(s1.ganttChart.subList(next, ++next));
@@ -216,12 +219,9 @@ public class GUI_ME {
             ; // Do Nothing
         }
         for (int i = table1.getRowCount(); i < process_count; i++) {
-            a[0]++;
             model1.addRow(a);
-            model1.setValueAt(a[0], a[0]-1, 0);
-            table1.setValueAt(a[0], a[0]-1, 0);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
-            sp1.setPreferredSize(new Dimension(600, (a[0]+1)*table1.getRowHeight()));
+            sp1.setPreferredSize(new Dimension(600, (process_count+1)*table1.getRowHeight()));
         }
 
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -279,7 +279,6 @@ public class GUI_ME {
         spinner_field = new JSpinner(model);
         quantum_field = new JSpinner(model2);
         spinner_field.addChangeListener(e -> ProccessChange());
-        ;
 
         leftPanel_One_1.add(label1);
         leftPanel_One_1.add(spinner_field);
@@ -321,9 +320,7 @@ public class GUI_ME {
         model1.addColumn("Arrival Time");
         model1.addColumn("CPU Burst Time");
         model1.addColumn("Priority");
-        a[0] = 1;
         model1.addRow(a);
-        table1.setValueAt(a[0], a[0]-1, 0);
 
         /*
          * table1 = new JTable(10,4);
@@ -378,7 +375,7 @@ public class GUI_ME {
         right_label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
         right_label.add(label0_0, BorderLayout.CENTER);
 
-        JPanel times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 90, 10));
+        times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 90, 10));
         times_panel.setBorder(BorderFactory.createEmptyBorder(20, 5, 5, 5));
         JPanel waitBox = new JPanel(new BorderLayout());
         JPanel turnTimeBox = new JPanel();
@@ -402,9 +399,11 @@ public class GUI_ME {
         turnTimeBox.add(turnTime_value);
 
         leftPanel_four.setLayout(new BoxLayout(leftPanel_four, BoxLayout.Y_AXIS));
+        leftPanel_four.setBorder(BorderFactory.createEmptyBorder(5, 2, 20, 2));
 
         times_panel.add(waitBox);
         times_panel.add(turnTimeBox);
+        times_panel.setVisible(false);
 
         JTable queue = new JTable(10, 2); // 2 is constant but colomn depends on process_num
         queue.setFillsViewportHeight(true);
@@ -415,8 +414,14 @@ public class GUI_ME {
         sp2.setPreferredSize(queue.getPreferredSize());
         sp2.setVisible(false);
 
+        JPanel time_container = new JPanel(new BorderLayout());
+        //////////////////////////////////////////////////////////////////////////////////////////
+        //                  ADD STOP BUTTON AND TIMER LABEL HERE
+        //                  ADD THEM AND TO time_container
+        //                  MAKE SURE TO SET TIMER LABEL TO: Time: 0 Sec
+        //////////////////////////////////////////////////////////////////////////////////////////
         time_container.add(times_panel);
-        time_container.setVisible(false);
+        time_container.setVisible(true);
         // panel_right.add(sp2,BorderLayout.NORTH);
         // leftPanel_four.add(time_container);
 
@@ -459,7 +464,7 @@ public class GUI_ME {
         label4.setForeground(Color.BLUE);
         wait_value.setForeground(Color.BLUE);
         turnTime_value.setForeground(Color.BLUE);
-        // empty.setBackground(custom_backcolor);
+        time_container.setBackground(custom_backcolor);
         sp2.setBackground(custom_backcolor);
 
         // option 2,3,4 only

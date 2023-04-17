@@ -39,6 +39,10 @@ public class Gantt extends JPanel {
 
         process = new String[n+1];
         for (int i = 0; i <= n; i++) {
+            if(i==0){
+                process[i] = "IDLE";
+                continue;
+            }
             process[i] = "P"+i;
         }
 
@@ -108,9 +112,13 @@ public class Gantt extends JPanel {
 
         TaskSeries[] ss = new TaskSeries[p_no+1];
 
-        for (int i = 0; i<=p_no; i++)
+        for (int i = 0; i<=p_no; i++){
+            if(i==0){
+                ss[i] = new TaskSeries("IDLE");
+                continue;
+            }
             ss[i] = new TaskSeries("P"+i);
-        
+        }
 
         for (int i = 0; i < ganttChart.size(); i++)
             ss[ganttChart.get(i).processId].add(new Task("P"+i+ganttChart.get(i).processId, new SimpleTimePeriod(ganttChart.get(i).startTime, ganttChart.get(i).endTime)));
