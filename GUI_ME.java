@@ -22,7 +22,9 @@ public class GUI_ME {
     protected static JPanel leftPanel_four = new JPanel(new BorderLayout());
     protected static JPanel times_panel;
     protected static DefaultTableModel model1;
+    protected static DefaultTableModel modelqueue;
     protected static JTable table1;
+    protected static JTable queue;
     protected static JScrollPane sp1;
     protected static JScrollPane sp2;
     protected static JFrame mainFrame;
@@ -137,7 +139,10 @@ public class GUI_ME {
 
         if (!get_data())
             return;
-
+        for (int i = 0; i < process_count; i++) {
+            modelqueue.setValueAt("", i, 0);
+            modelqueue.setValueAt("", i, 1);
+        }
         SwingUtilities.updateComponentTreeUI(mainFrame);
 
         if (schedular == "FCFS") {
@@ -234,6 +239,11 @@ public class GUI_ME {
 
             }
 
+            if(next == s1.readyQueue.get(process_count-1).getArrivalTime()){
+                modelqueue.setValueAt("P"+s1.readyQueue.get(process_count-1).getProcessID(), s1.readyQueue.get(process_count-1).getProcessID()-1, 0);
+                modelqueue.setValueAt(s1.readyQueue.get(process_count-1).getBurstTime(), s1.readyQueue.get(process_count-1).getProcessID()-1, 1);
+            }  
+                      
             s1.execute();
             timer.start();
             stop_resume.setText("Stop");
@@ -248,11 +258,27 @@ public class GUI_ME {
             times_panel.setVisible(true);
             timerJPanel.setVisible(false);
         }
-        leftPanel_four.removeAll();
+        
         DynamicQueue.addAll(s1.ganttChart.subList(next, ++next));
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
+        leftPanel_four.removeAll();
         leftPanel_four.add(g);
         time_value.setText("Time: "+next+" Sec");
+
+        int id = DynamicQueue.get(next-1).getProcessId()-1;
+        if(id >= 0){
+            Integer burst = (Integer) modelqueue.getValueAt(id, 1);
+            modelqueue.setValueAt(burst-1, id, 1);        
+        }
+
+        s1.sort_readyQueue(SORTING_CRITERIA.ARRIVAL_TIME);
+        for (Process p : s1.readyQueue) {
+            if(next == p.getArrivalTime()){
+                modelqueue.setValueAt("P"+p.getProcessID(), p.getProcessID()-1, 0);
+                modelqueue.setValueAt(p.getBurstTime(), p.getProcessID()-1, 1);
+            }            
+        }
+
         SwingUtilities.updateComponentTreeUI(mainFrame);
 
     }
@@ -281,6 +307,9 @@ public class GUI_ME {
             model1.addRow(a);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
             sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
+            modelqueue.addRow(new Integer[2]);
+            queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
+            sp2.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
         }
 
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -453,12 +482,17 @@ public class GUI_ME {
         times_panel.add(turnTimeBox);
         times_panel.setVisible(false);
 
-        JTable queue = new JTable(10, 2); // 2 is constant but colomn depends on process_num
+        modelqueue = new DefaultTableModel();
+        queue = new JTable(modelqueue);
+        modelqueue.addColumn("Process in Ready Queue"); 
+        modelqueue.addColumn("Remaining Burst Time"); 
+        modelqueue.addRow(new Integer[2]);
+        queue.setRowHeight(20);
         queue.setFillsViewportHeight(true);
         queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
         queue.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         sp2 = new JScrollPane(queue);
-        sp2.setPreferredSize(queue.getPreferredSize());
+        sp2.setPreferredSize(new Dimension(600, queue.getRowHeight()*2));
         sp2.setVisible(false);
 
         JPanel time_container = new JPanel(new BorderLayout());
