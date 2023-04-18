@@ -10,12 +10,15 @@ public class GUI_ME {
 
     protected static JLabel turnTime_value;
     protected static JLabel wait_value;
+    protected static JLabel time_value;
     protected static JComboBox<String> comboBox;
     protected static JSpinner spinner_field;
     protected static JSpinner quantum_field;
+    protected static JButton stop_resume;
     protected static JLabel labelq;
     protected static JLabel labelmsg;
     protected static JPanel leftPanel_Two;
+    protected static JPanel timerJPanel;
     protected static JPanel leftPanel_four = new JPanel(new BorderLayout());
     protected static JPanel times_panel;
     protected static DefaultTableModel model1;
@@ -31,18 +34,19 @@ public class GUI_ME {
     protected static ArrayList<Process> readyQueue;
     protected static ArrayList<Gantt_Process> DynamicQueue = new ArrayList<Gantt_Process>(0);
     protected static Timer timer = null;
+    protected static boolean stop = true;
 
     public static boolean get_data() {
         readyQueue = new ArrayList<Process>();
 
         for (int count = 0; count < process_count; count++) {
-            int id = count + 1;     // Process ID
-            int arrival = 0;        // Arrival Time
-            int CPU_Time = 0;       // CPU Burst Time
-            int pri = 0;            // Priority
+            int id = count + 1; // Process ID
+            int arrival = 0; // Arrival Time
+            int CPU_Time = 0; // CPU Burst Time
+            int pri = 0; // Priority
             try {
                 int temp = Integer.valueOf((String) table1.getValueAt(count, 0));
-                id = (temp <= process_count)?temp:id;
+                id = (temp <= process_count) ? temp : id;
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
                 pri = Integer.valueOf((String) table1.getValueAt(count, 3)) == null ? 5
@@ -104,7 +108,7 @@ public class GUI_ME {
             s1 = new Priority(readyQueue, true);
 
         }
-        
+
         s1.execute();
 
         leftPanel_four.removeAll();
@@ -114,12 +118,11 @@ public class GUI_ME {
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
         times_panel.setVisible(true);
-        sp2.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
     public static void DynamicButtonPressed() {
-        next = 0;
+        next = 1;
         DynamicQueue.removeAll(DynamicQueue);
         times_panel.setVisible(false);
         sp2.setVisible(false);
@@ -143,11 +146,11 @@ public class GUI_ME {
 
         } else if (schedular == "SJF_Preemptive") {
 
-            s1 = new SJF(readyQueue, false);
+            s1 = new SJF(readyQueue, true);
 
         } else if (schedular == "SJF_Non_Preemptive") {
 
-            s1 = new SJF(readyQueue, true);
+            s1 = new SJF(readyQueue, false);
 
         } else if (schedular == "Round_Robin") {
             try {
@@ -181,19 +184,75 @@ public class GUI_ME {
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
         sp2.setVisible(true);
+        timerJPanel.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
+    public static void stopResume() {
+        if (stop) {
+            stop = false;
+            timer.stop();
+            stop_resume.setText("Resume");
+        } else {
+            stop = true;
+            String schedular = comboBox.getSelectedObjects()[0].toString();
+            int quantum = 1;
+            
+            if (!get_data())
+                return;
 
-    public static void repeat(){
-        if (next == s1.ganttChart.size()-1) {
+            if (schedular == "FCFS") {
+
+                s1 = new FCFS(readyQueue);
+
+            } else if (schedular == "SJF_Preemptive") {
+
+                s1 = new SJF(readyQueue, true);
+
+            } else if (schedular == "SJF_Non_Preemptive") {
+
+                s1 = new SJF(readyQueue, false);
+
+            } else if (schedular == "Round_Robin") {
+                try {
+                    quantum_field.commitEdit();
+                    quantum = (Integer) quantum_field.getValue();
+                } catch (java.text.ParseException e) {
+                    labelmsg.setText("Error while reading Quantum value - set to 1 (Default)");
+                    labelmsg.setForeground(new Color(255, 0, 0));
+                    SwingUtilities.updateComponentTreeUI(mainFrame);
+                }
+                s1 = new Round_Robin(readyQueue, quantum);
+
+            } else if (schedular == "Priority_Non_Preemptive") {
+
+                s1 = new Priority(readyQueue, false);
+
+            } else if (schedular == "Priority_Preemptive") {
+
+                s1 = new Priority(readyQueue, true);
+
+            }
+
+            s1.execute();
+            timer.start();
+            stop_resume.setText("Stop");
+        }
+
+        SwingUtilities.updateComponentTreeUI(mainFrame);
+    }
+
+    public static void repeat() {
+        if (next == s1.ganttChart.size() - 1) {
             timer.stop();
             times_panel.setVisible(true);
+            timerJPanel.setVisible(false);
         }
         leftPanel_four.removeAll();
         DynamicQueue.addAll(s1.ganttChart.subList(next, ++next));
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
         leftPanel_four.add(g);
+        time_value.setText("Time: "+next+" Sec");
         SwingUtilities.updateComponentTreeUI(mainFrame);
 
     }
@@ -221,7 +280,7 @@ public class GUI_ME {
         for (int i = table1.getRowCount(); i < process_count; i++) {
             model1.addRow(a);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
-            sp1.setPreferredSize(new Dimension(600, (process_count+1)*table1.getRowHeight()));
+            sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
         }
 
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -249,6 +308,7 @@ public class GUI_ME {
         Font msg = new Font("Arial", Font.BOLD, 16);
         Font header = new Font("Serif", Font.BOLD, 22);
 
+
         // ============================== LEFT PANEL
         // ================================================
 
@@ -264,15 +324,14 @@ public class GUI_ME {
         leftPanel_One.setLayout(new BoxLayout(leftPanel_One, BoxLayout.Y_AXIS));
         leftPanel_One.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
+        JPanel leftPanel_One_1 = new JPanel();
+        leftPanel_One_1.setLayout(new FlowLayout());
+        leftPanel_One_1.setBorder(BorderFactory.createEmptyBorder(20, 3, 3, 3));
+
         JLabel label0 = new JLabel("Input Panel");
         label0.setFont(header);
         JLabel label1 = new JLabel("Number of Processes: ");
         labelq = new JLabel("Quantum: ");
-        labelmsg = new JLabel();
-
-        JPanel leftPanel_One_1 = new JPanel();
-        leftPanel_One_1.setLayout(new FlowLayout());
-        leftPanel_One_1.setBorder(BorderFactory.createEmptyBorder(20, 3, 3, 3));
 
         SpinnerNumberModel model = new SpinnerNumberModel(1, 1, 100, 1);
         SpinnerNumberModel model2 = new SpinnerNumberModel(1, 1, 100, 1);
@@ -290,24 +349,27 @@ public class GUI_ME {
         leftPanel_Two = new JPanel();
         leftPanel_Two.setLayout(new FlowLayout());
         leftPanel_Two.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+
         JLabel label2 = new JLabel("Scheduler Type: ");
         String[] schedule_Options = { "--Choose Schedular--", "FCFS", "SJF_Preemptive", "SJF_Non_Preemptive",
                 "Round_Robin", "Priority_Non_Preemptive", "Priority_Preemptive" };
         comboBox = new JComboBox<String>(schedule_Options);
-
         comboBox.addActionListener(e -> SchedulerChange());
 
         leftPanel_Two.add(label2);
         leftPanel_Two.add(comboBox);
 
-        panel_Left_Container1.add(leftPanel_One, BorderLayout.NORTH);
-        panel_Left_Container1.add(leftPanel_Two, BorderLayout.CENTER);
-
         JPanel leftPanel_three = new JPanel();
         leftPanel_three.setLayout(new BorderLayout());
         leftPanel_three.setBorder(BorderFactory.createEmptyBorder(15, 20, 0, 20));
+
+        labelmsg = new JLabel();
         labelmsg.setFont(msg);
+
         leftPanel_three.add(labelmsg);
+
+        panel_Left_Container1.add(leftPanel_One, BorderLayout.NORTH);
+        panel_Left_Container1.add(leftPanel_Two, BorderLayout.CENTER);
         panel_Left_Container1.add(leftPanel_three, BorderLayout.AFTER_LAST_LINE);
 
         JPanel panel_Left_Container2 = new JPanel();
@@ -321,38 +383,20 @@ public class GUI_ME {
         model1.addColumn("CPU Burst Time");
         model1.addColumn("Priority");
         model1.addRow(a);
-
-        /*
-         * table1 = new JTable(10,4);
-         * JTableHeader header= table1.getTableHeader();
-         * TableColumnModel colMod = header.getColumnModel();
-         * TableColumn tabCol = colMod.getColumn(0);
-         * tabCol.setHeaderValue("Proccess ID");
-         * tabCol = colMod.getColumn(1);
-         * tabCol.setHeaderValue("Arrival Time");
-         * tabCol = colMod.getColumn(2);
-         * tabCol.setHeaderValue("CPU Burst Time");
-         * tabCol = colMod.getColumn(3);
-         * tabCol.setHeaderValue("Priority");
-         * header.repaint();
-         */
         table1.setRowHeight(20);
         table1.setFillsViewportHeight(true);
         table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         sp1 = new JScrollPane(table1);
-        sp1.setPreferredSize(new Dimension(600, table1.getRowHeight()*2));
+        sp1.setPreferredSize(new Dimension(600, table1.getRowHeight() * 2));
 
         JPanel button_pane = new JPanel();
         button_pane.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
         button_pane.setBorder(BorderFactory.createEmptyBorder(30, 10, 10, 10));
-
         JButton b1 = new JButton("Static Schedule");
         JButton b2 = new JButton("Dynamic Schedule");
-
         b1.addActionListener(e -> StaticButtonPressed());
         b2.addActionListener(e -> DynamicButtonPressed());
-
         button_pane.add(b1);
         button_pane.add(b2);
 
@@ -371,35 +415,39 @@ public class GUI_ME {
 
         JLabel label0_0 = new JLabel("Output Panel");
         label0_0.setFont(header);
+
         JPanel right_label = new JPanel(new FlowLayout(FlowLayout.CENTER));
         right_label.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
         right_label.add(label0_0, BorderLayout.CENTER);
 
-        times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 90, 10));
-        times_panel.setBorder(BorderFactory.createEmptyBorder(20, 5, 5, 5));
         JPanel waitBox = new JPanel(new BorderLayout());
         JPanel turnTimeBox = new JPanel();
         waitBox.setLayout(new BoxLayout(waitBox, BoxLayout.Y_AXIS));
         turnTimeBox.setLayout(new BoxLayout(turnTimeBox, BoxLayout.Y_AXIS));
+
         JLabel label3 = new JLabel("Avg Waiting Time");
-        Font f1 = new Font("Arial", Font.BOLD, 16);
-        label3.setFont(f1);
+        label3.setFont(msg);
         wait_value = new JLabel("11");
-        wait_value.setFont(f1);
+        wait_value.setFont(msg);
         wait_value.setBorder(BorderFactory.createEmptyBorder(5, 45, 2, 2));
+
         waitBox.add(label3);
         waitBox.add(wait_value);
 
         JLabel label4 = new JLabel("Avg Turn-Around Time");
-        label4.setFont(f1);
+        label4.setFont(msg);
         turnTime_value = new JLabel("22");
-        turnTime_value.setFont(f1);
+        turnTime_value.setFont(msg);
         turnTime_value.setBorder(BorderFactory.createEmptyBorder(5, 60, 2, 2));
+
         turnTimeBox.add(label4);
         turnTimeBox.add(turnTime_value);
 
         leftPanel_four.setLayout(new BoxLayout(leftPanel_four, BoxLayout.Y_AXIS));
         leftPanel_four.setBorder(BorderFactory.createEmptyBorder(5, 2, 20, 2));
+
+        times_panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 90, 10));
+        times_panel.setBorder(BorderFactory.createEmptyBorder(20, 5, 5, 5));
 
         times_panel.add(waitBox);
         times_panel.add(turnTimeBox);
@@ -409,34 +457,37 @@ public class GUI_ME {
         queue.setFillsViewportHeight(true);
         queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
         queue.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
         sp2 = new JScrollPane(queue);
         sp2.setPreferredSize(queue.getPreferredSize());
         sp2.setVisible(false);
 
         JPanel time_container = new JPanel(new BorderLayout());
-        //////////////////////////////////////////////////////////////////////////////////////////
-        //                  ADD STOP BUTTON AND TIMER LABEL HERE
-        //                  ADD THEM AND TO time_container
-        //                  MAKE SURE TO SET TIMER LABEL TO: Time: 0 Sec
-        //////////////////////////////////////////////////////////////////////////////////////////
         time_container.add(times_panel);
         time_container.setVisible(true);
-        // panel_right.add(sp2,BorderLayout.NORTH);
-        // leftPanel_four.add(time_container);
 
-        /*
-         * JPanel empty = new JPanel();
-         * empty.setLayout(new BorderLayout());
-         * empty.setBorder(BorderFactory.createEmptyBorder(15,20,100,20));
-         * empty.add(sp2,BorderLayout.CENTER);
-         * empty.setSize(sp2.getPreferredSize());
-         */
+        time_value = new JLabel("Time: 1 Sec");
+        time_value.setFont(msg);
 
+        stop_resume = new JButton("Stop");
+        stop_resume.addActionListener(e -> stopResume());
+
+        timerJPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 90, 10));
+        timerJPanel.add(time_value);
+        timerJPanel.add(stop_resume);
+        timerJPanel.setVisible(false);
+
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.add(timerJPanel);
+        container.add(time_container);
+        container.setVisible(true);
+
+        
         panel_right.add(right_label, BorderLayout.PAGE_START);
         panel_right.add(leftPanel_four);
-        panel_right.add(time_container);
+        panel_right.add(container);
         panel_right.add(sp2, BorderLayout.CENTER);
+
 
         // ================ COLOR ===================================
         leftPanel_four.setBackground(custom_backcolor);
@@ -451,7 +502,7 @@ public class GUI_ME {
         label3.setBackground(custom_backcolor);
         label4.setBackground(custom_backcolor);
         sp1.setBackground(custom_backcolor);
-        // sp2.setBackground(custom_backcolor);
+        container.setBackground(custom_backcolor);
         leftPanel_One.setBackground(custom_backcolor);
         leftPanel_One_1.setBackground(custom_backcolor);
         leftPanel_Two.setBackground(custom_backcolor);
@@ -465,6 +516,7 @@ public class GUI_ME {
         wait_value.setForeground(Color.BLUE);
         turnTime_value.setForeground(Color.BLUE);
         time_container.setBackground(custom_backcolor);
+        timerJPanel.setBackground(custom_backcolor);
         sp2.setBackground(custom_backcolor);
 
         // option 2,3,4 only
@@ -479,6 +531,7 @@ public class GUI_ME {
         labelmsg.setForeground(Color.WHITE);
         wait_value.setForeground(Color.WHITE);
         turnTime_value.setForeground(Color.WHITE);
+        time_value.setForeground(Color.WHITE);
 
         // ======================== MAIN FRAME ======================================
 
