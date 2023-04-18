@@ -73,6 +73,15 @@ public class GUI_ME {
         String schedular = comboBox.getSelectedObjects()[0].toString();
         int quantum = 1;
 
+        sp2.setVisible(false);
+        timerJPanel.setVisible(false);
+
+        try {
+            timer.stop();
+        } catch (Exception e) {
+            ;
+        }
+
         if (!get_data())
             return;
 
@@ -124,10 +133,17 @@ public class GUI_ME {
     }
 
     public static void DynamicButtonPressed() {
-        next = 1;
+        next = 0;
         DynamicQueue.removeAll(DynamicQueue);
         times_panel.setVisible(false);
-        sp2.setVisible(false);
+
+        try {
+            timer.stop();
+            stop = true;
+            stop_resume.setText("Stop");
+        } catch (Exception e) {
+            ;
+        }
 
         timer = new Timer(2000, new Dynamic_Gantt());
         timer.setRepeats(true);
@@ -180,16 +196,24 @@ public class GUI_ME {
 
         s1.execute();
 
-        DynamicQueue.addAll(s1.ganttChart.subList(0, 1));
+        for (Process p : readyQueue) {
+            if(next == p.getArrivalTime()){
+                modelqueue.setValueAt("P"+p.getProcessID(), p.getProcessID()-1, 0);
+                modelqueue.setValueAt(p.getBurstTime(), p.getProcessID()-1, 1);
+            }            
+        }       
 
         leftPanel_four.removeAll();
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
-        g.setVisible(true);
         leftPanel_four.add(g);
+        
+        time_value.setText("Time: 0 Sec");
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
+
         sp2.setVisible(true);
         timerJPanel.setVisible(true);
+
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
@@ -258,25 +282,29 @@ public class GUI_ME {
             times_panel.setVisible(true);
             timerJPanel.setVisible(false);
         }
-        
+
         DynamicQueue.addAll(s1.ganttChart.subList(next, ++next));
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
         leftPanel_four.removeAll();
         leftPanel_four.add(g);
         time_value.setText("Time: "+next+" Sec");
 
-        int id = DynamicQueue.get(next-1).getProcessId()-1;
-        if(id >= 0){
-            Integer burst = (Integer) modelqueue.getValueAt(id, 1);
-            modelqueue.setValueAt(burst-1, id, 1);        
-        }
-
-        s1.sort_readyQueue(SORTING_CRITERIA.ARRIVAL_TIME);
-        for (Process p : s1.readyQueue) {
+        for (Process p : readyQueue) {
             if(next == p.getArrivalTime()){
                 modelqueue.setValueAt("P"+p.getProcessID(), p.getProcessID()-1, 0);
                 modelqueue.setValueAt(p.getBurstTime(), p.getProcessID()-1, 1);
             }            
+        }        
+        
+        int id = DynamicQueue.get(next-1).getProcessId()-1;
+        if(id >= 0){
+            Integer burst;
+            try {
+                burst = (Integer) modelqueue.getValueAt(id, 1);
+            } catch (Exception e) {
+                burst = Integer.valueOf((String) modelqueue.getValueAt(id, 1));
+            }
+            modelqueue.setValueAt(burst-1, id, 1);        
         }
 
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -499,7 +527,7 @@ public class GUI_ME {
         time_container.add(times_panel);
         time_container.setVisible(true);
 
-        time_value = new JLabel("Time: 1 Sec");
+        time_value = new JLabel("Time: 0 Sec");
         time_value.setFont(msg);
 
         stop_resume = new JButton("Stop");
