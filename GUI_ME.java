@@ -337,7 +337,8 @@ public class GUI_ME {
             sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
             modelqueue.addRow(new Integer[2]);
             queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
-            sp2.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
+            int height = (process_count + 1) * table1.getRowHeight();
+            sp2.setPreferredSize(new Dimension(600,(height > 300)?300:height));
         }
 
         SwingUtilities.updateComponentTreeUI(mainFrame);
