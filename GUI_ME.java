@@ -136,6 +136,8 @@ public class GUI_ME {
         change = 0;
         quantum_field.setEnabled(true);
         comboBox.setEnabled(true);
+        spinner_field.setEnabled(true);
+        table1.setEnabled(true);
         sp2.setVisible(false);
         timerJPanel.setVisible(false);
         leftPanel_four.removeAll();
@@ -191,6 +193,8 @@ public class GUI_ME {
             
         quantum_field.setEnabled(false);
         comboBox.setEnabled(false);
+        spinner_field.setEnabled(false);
+        table1.setEnabled(false);
 
         s1.execute();
 
@@ -221,10 +225,14 @@ public class GUI_ME {
 
     public static void stopResume() {
         if (stop) {
+            spinner_field.setEnabled(true);
+            table1.setEnabled(true);
             stop = false;
             timer.stop();
             stop_resume.setText("Resume");
         } else {
+            spinner_field.setEnabled(false);
+            table1.setEnabled(false);
             stop = true;
             
             if (!get_data())
@@ -255,7 +263,9 @@ public class GUI_ME {
             timerJPanel.setVisible(false);
             quantum_field.setEnabled(true);
             comboBox.setEnabled(true);
-            }
+            spinner_field.setEnabled(true);
+            table1.setEnabled(true);
+        }
 
         DynamicQueue.addAll(s1.ganttChart.subList(next, ++next));
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
@@ -326,7 +336,16 @@ public class GUI_ME {
             int height = (process_count + 1) * table1.getRowHeight();
             sp2.setPreferredSize(new Dimension(600,(height > 300)?300:height));
         }
-        
+        for(int i = table1.getRowCount()-1; i >= process_count ; i--){
+            change++;
+            model1.removeRow(i);;
+            table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
+            sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
+            modelqueue.removeRow(i);;
+            queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
+            int height = (process_count + 1) * table1.getRowHeight();
+            sp2.setPreferredSize(new Dimension(600,(height > 300)?300:height));
+        }
         SwingUtilities.updateComponentTreeUI(mainFrame);
 
     }
@@ -506,6 +525,7 @@ public class GUI_ME {
         queue.setFillsViewportHeight(true);
         queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
         queue.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        queue.setEnabled(false);
         sp2 = new JScrollPane(queue);
         sp2.setPreferredSize(new Dimension(600, queue.getRowHeight()*2));
         sp2.setVisible(false);
