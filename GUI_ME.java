@@ -294,6 +294,17 @@ public class GUI_ME {
             leftPanel_Two.remove(labelq);
             leftPanel_Two.remove(quantum_field);
         }
+        if (schedular == "SJF_Preemptive" || schedular == "Priority_Preemptive") {
+            table1.getColumnModel().getColumn(3).setPreferredWidth(table1.getColumnModel().getColumn(0).getWidth());
+            table1.getColumnModel().getColumn(3).setMaxWidth(table1.getColumnModel().getColumn(0).getMaxWidth());
+            table1.getColumnModel().getColumn(3).setMinWidth(table1.getColumnModel().getColumn(0).getMinWidth());
+            table1.getColumnModel().getColumn(3).setResizable(true);
+        }else{
+            table1.getColumnModel().getColumn(3).setPreferredWidth(0);
+            table1.getColumnModel().getColumn(3).setMaxWidth(0);
+            table1.getColumnModel().getColumn(3).setMinWidth(0);
+            table1.getColumnModel().getColumn(3).setResizable(false);
+        }
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
@@ -315,7 +326,7 @@ public class GUI_ME {
             int height = (process_count + 1) * table1.getRowHeight();
             sp2.setPreferredSize(new Dimension(600,(height > 300)?300:height));
         }
-
+        
         SwingUtilities.updateComponentTreeUI(mainFrame);
 
     }
