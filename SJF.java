@@ -200,9 +200,5 @@ public class SJF extends  Scheduler
         	}        	
         	ganttChart = merge_ToGanttChart(tempGanttChart);      	
         }
-<<<<<<< HEAD
-        return ;
-=======
->>>>>>> 131b532 (Implementing SJF Scheduling Algorithm)
     }
 }

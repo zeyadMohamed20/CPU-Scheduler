@@ -57,21 +57,21 @@ public class GUI_ME {
                 }
             } catch (Exception e) {
                 labelmsg.setText("Please Complete the process information at row: " + (count + 1));
-                labelmsg.setForeground(new Color(255, 0, 0));
+                labelmsg.setForeground(Color.RED);
                 return false;
             }
             Process p = new Process(id, arrival, CPU_Time, pri);
 
             readyQueue.add(p);
             labelmsg.setText("Data OK - Schedular is running...");
-            // labelmsg.setForeground(new Color(0, 0, 255));
+            labelmsg.setForeground(Color.WHITE);
         }
 
         return true;
 
     }
 
-    public static Scheduler intializScheduler(){
+    public static boolean intializScheduler(){
         int quantum = 1;
         if (schedular == "FCFS") {
 
@@ -91,8 +91,7 @@ public class GUI_ME {
                 quantum = (Integer) quantum_field.getValue();
             } catch (java.text.ParseException e) {
                 labelmsg.setText("Error while reading Quantum value - set to 1 (Default)");
-                labelmsg.setForeground(new Color(255, 0, 0));
-                SwingUtilities.updateComponentTreeUI(mainFrame);
+                labelmsg.setForeground(Color.RED);
             }
             s1 = new Round_Robin(readyQueue, quantum);
 
@@ -104,8 +103,12 @@ public class GUI_ME {
 
             s1 = new Priority(readyQueue, true);
 
+        }else{
+            labelmsg.setText("Please Select a Scheduler");
+            labelmsg.setForeground(Color.RED);
+            return false;
         }
-        return s1;
+        return true;
     }
 
     public static void StaticButtonPressed() {
@@ -121,9 +124,9 @@ public class GUI_ME {
         if (!get_data())
             return;
 
-        SwingUtilities.updateComponentTreeUI(mainFrame);
+        if(!intializScheduler()) 
+            return ;
 
-        s1 = intializScheduler();
         s1.execute();
 
         leftPanel_four.removeAll();
@@ -160,9 +163,10 @@ public class GUI_ME {
             modelqueue.setValueAt("", i, 0);
             modelqueue.setValueAt("", i, 1);
         }
-        SwingUtilities.updateComponentTreeUI(mainFrame);
 
-        s1 = intializScheduler();
+        if(!intializScheduler()) 
+            return ;
+
         s1.execute();
 
         for (Process p : readyQueue) {
@@ -195,9 +199,10 @@ public class GUI_ME {
             stop = true;
             
             if (!get_data())
-                return;
+                return ;
 
-            s1 = intializScheduler();
+            if(!intializScheduler()) 
+                return ;
 
             if(next == s1.readyQueue.get(process_count-1).getArrivalTime()){
                 modelqueue.setValueAt("P"+s1.readyQueue.get(process_count-1).getProcessID(), s1.readyQueue.get(process_count-1).getProcessID()-1, 0);
