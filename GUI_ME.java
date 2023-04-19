@@ -33,6 +33,7 @@ public class GUI_ME {
     protected static String schedular;
     protected static Integer[] a = new Integer[4];
     protected static int next = 0;
+    protected static int change = 0;
     protected static Scheduler s1;
     protected static ArrayList<Process> readyQueue;
     protected static ArrayList<Gantt_Process> DynamicQueue = new ArrayList<Gantt_Process>(0);
@@ -43,20 +44,40 @@ public class GUI_ME {
         readyQueue = new ArrayList<Process>();
 
         for (int count = 0; count < process_count; count++) {
-            int id = count + 1; // Process ID
-            int arrival = 0; // Arrival Time
-            int CPU_Time = 0; // CPU Burst Time
-            int pri = 0; // Priority
+            Integer id = count + 1;     // Process ID
+            Integer arrival = 0;        // Arrival Time
+            Integer CPU_Time = 0;       // CPU Burst Time
+            Integer pri = 0;            // Priority
             try {
                 int temp = Integer.valueOf((String) table1.getValueAt(count, 0));
-                id = (temp <= process_count) ? temp : id;
+                if(temp > process_count){
+                    model1.setValueAt(id.toString(), count, 0);
+                }else{
+                    id = temp;
+                }
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
                 if (schedular == "SJF_Preemptive" || schedular == "Priority_Preemptive") {
                     pri = Integer.valueOf((String) table1.getValueAt(count, 3));
                 }
             } catch (Exception e) {
-                labelmsg.setText("Please Complete the process information at row: " + (count + 1));
+                StackTraceElement[] a = e.getStackTrace();
+                switch(a[2].toString().substring(28, 30)){
+                    case "52":
+                        labelmsg.setText("Missing (Process ID) at row: " + (count + 1) + " - Please press Enter in the cell");
+                        break;
+                    case "58":
+                        labelmsg.setText("Missing (Arrival Time) of proccess: " + (id) + " - Please press Enter in the cell");
+                        break;
+                    case "59":
+                        labelmsg.setText("Missing (CPU Burst Time) of proccess: " + (id) + " - Please press Enter in the cell");
+                        break;
+                    case "61":
+                        labelmsg.setText("Missing (Priority) of proccess: " + (id) + " - Please press Enter in the cell");
+                        break;
+                    default:
+                        labelmsg.setText("Missing/Wrong Information at row: " + (count + 1) + " - Please press Enter in each cell");
+                }
                 labelmsg.setForeground(Color.RED);
                 return false;
             }
@@ -112,8 +133,11 @@ public class GUI_ME {
     }
 
     public static void StaticButtonPressed() {
+        change = 0;
         sp2.setVisible(false);
         timerJPanel.setVisible(false);
+        leftPanel_four.removeAll();
+        times_panel.setVisible(false);
 
         try {
             timer.stop();
@@ -129,20 +153,20 @@ public class GUI_ME {
 
         s1.execute();
 
-        leftPanel_four.removeAll();
         Gantt g = new Gantt("CPU Schedular", s1.ganttChart, process_count);
         g.setVisible(true);
         leftPanel_four.add(g);
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
-        times_panel.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
     public static void DynamicButtonPressed() {
+        change = 0;
         next = 0;
         DynamicQueue.removeAll(DynamicQueue);
         times_panel.setVisible(false);
+        leftPanel_four.removeAll();
 
         try {
             timer.stop();
@@ -151,11 +175,6 @@ public class GUI_ME {
         } catch (Exception e) {
             ;
         }
-
-        timer = new Timer(2000, new Dynamic_Gantt());
-        timer.setRepeats(true);
-        timer.setInitialDelay(2000);
-        timer.start();
 
         if (!get_data())
             return;
@@ -169,6 +188,11 @@ public class GUI_ME {
 
         s1.execute();
 
+        timer = new Timer(2000, new Dynamic_Gantt());
+        timer.setRepeats(true);
+        timer.setInitialDelay(2000);
+        timer.start();
+
         for (Process p : readyQueue) {
             if(next == p.getArrivalTime()){
                 modelqueue.setValueAt("P"+p.getProcessID(), p.getProcessID()-1, 0);
@@ -176,7 +200,6 @@ public class GUI_ME {
             }            
         }       
 
-        leftPanel_four.removeAll();
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
         leftPanel_four.add(g);
         
@@ -203,11 +226,13 @@ public class GUI_ME {
 
             if(!intializScheduler()) 
                 return ;
+            for (; change > 0; change--) {
+                if(next == s1.readyQueue.get(process_count-change).getArrivalTime()){
+                    modelqueue.setValueAt("P"+s1.readyQueue.get(process_count-change).getProcessID(), s1.readyQueue.get(process_count-change).getProcessID()-1, 0);
+                    modelqueue.setValueAt(s1.readyQueue.get(process_count-change).getBurstTime(), s1.readyQueue.get(process_count-change).getProcessID()-1, 1);
+                }              
+            }
 
-            if(next == s1.readyQueue.get(process_count-1).getArrivalTime()){
-                modelqueue.setValueAt("P"+s1.readyQueue.get(process_count-1).getProcessID(), s1.readyQueue.get(process_count-1).getProcessID()-1, 0);
-                modelqueue.setValueAt(s1.readyQueue.get(process_count-1).getBurstTime(), s1.readyQueue.get(process_count-1).getProcessID()-1, 1);
-            }  
                       
             s1.execute();
             timer.start();
@@ -273,6 +298,7 @@ public class GUI_ME {
             ; // Do Nothing
         }
         for (int i = table1.getRowCount(); i < process_count; i++) {
+            change++;
             model1.addRow(a);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
             sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
