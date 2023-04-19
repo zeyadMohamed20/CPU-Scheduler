@@ -134,6 +134,8 @@ public class GUI_ME {
 
     public static void StaticButtonPressed() {
         change = 0;
+        quantum_field.setEnabled(true);
+        comboBox.setEnabled(true);
         sp2.setVisible(false);
         timerJPanel.setVisible(false);
         leftPanel_four.removeAll();
@@ -158,6 +160,7 @@ public class GUI_ME {
         leftPanel_four.add(g);
         wait_value.setText(s1.averageWaitingTime + " s");
         turnTime_value.setText(s1.averageTurnAroundTime + " s");
+        times_panel.setVisible(true);
         SwingUtilities.updateComponentTreeUI(mainFrame);
     }
 
@@ -185,6 +188,9 @@ public class GUI_ME {
 
         if(!intializScheduler()) 
             return ;
+            
+        quantum_field.setEnabled(false);
+        comboBox.setEnabled(false);
 
         s1.execute();
 
@@ -247,7 +253,9 @@ public class GUI_ME {
             timer.stop();
             times_panel.setVisible(true);
             timerJPanel.setVisible(false);
-        }
+            quantum_field.setEnabled(true);
+            comboBox.setEnabled(true);
+            }
 
         DynamicQueue.addAll(s1.ganttChart.subList(next, ++next));
         Gantt g = new Gantt("CPU Schedular", DynamicQueue, process_count);
