@@ -30,8 +30,9 @@ public class GUI_ME {
     protected static JFrame mainFrame;
 
     protected static int process_count = 1;
+    protected static String schedular;
     protected static Integer[] a = new Integer[4];
-    protected static int next = 1;
+    protected static int next = 0;
     protected static Scheduler s1;
     protected static ArrayList<Process> readyQueue;
     protected static ArrayList<Gantt_Process> DynamicQueue = new ArrayList<Gantt_Process>(0);
@@ -51,8 +52,9 @@ public class GUI_ME {
                 id = (temp <= process_count) ? temp : id;
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
-                pri = Integer.valueOf((String) table1.getValueAt(count, 3)) == null ? 5
-                        : Integer.valueOf((String) table1.getValueAt(count, 3));
+                if (schedular == "SJF_Preemptive" || schedular == "Priority_Preemptive") {
+                    pri = Integer.valueOf((String) table1.getValueAt(count, 3));
+                }
             } catch (Exception e) {
                 labelmsg.setText("Please Complete the process information at row: " + (count + 1));
                 labelmsg.setForeground(new Color(255, 0, 0));
@@ -69,24 +71,8 @@ public class GUI_ME {
 
     }
 
-    public static void StaticButtonPressed() {
-        String schedular = comboBox.getSelectedObjects()[0].toString();
+    public static Scheduler intializScheduler(){
         int quantum = 1;
-
-        sp2.setVisible(false);
-        timerJPanel.setVisible(false);
-
-        try {
-            timer.stop();
-        } catch (Exception e) {
-            ;
-        }
-
-        if (!get_data())
-            return;
-
-        SwingUtilities.updateComponentTreeUI(mainFrame);
-
         if (schedular == "FCFS") {
 
             s1 = new FCFS(readyQueue);
@@ -119,7 +105,25 @@ public class GUI_ME {
             s1 = new Priority(readyQueue, true);
 
         }
+        return s1;
+    }
 
+    public static void StaticButtonPressed() {
+        sp2.setVisible(false);
+        timerJPanel.setVisible(false);
+
+        try {
+            timer.stop();
+        } catch (Exception e) {
+            ;
+        }
+
+        if (!get_data())
+            return;
+
+        SwingUtilities.updateComponentTreeUI(mainFrame);
+
+        s1 = intializScheduler();
         s1.execute();
 
         leftPanel_four.removeAll();
@@ -150,9 +154,6 @@ public class GUI_ME {
         timer.setInitialDelay(2000);
         timer.start();
 
-        String schedular = comboBox.getSelectedObjects()[0].toString();
-        int quantum = 1;
-
         if (!get_data())
             return;
         for (int i = 0; i < process_count; i++) {
@@ -161,39 +162,7 @@ public class GUI_ME {
         }
         SwingUtilities.updateComponentTreeUI(mainFrame);
 
-        if (schedular == "FCFS") {
-
-            s1 = new FCFS(readyQueue);
-
-        } else if (schedular == "SJF_Preemptive") {
-
-            s1 = new SJF(readyQueue, true);
-
-        } else if (schedular == "SJF_Non_Preemptive") {
-
-            s1 = new SJF(readyQueue, false);
-
-        } else if (schedular == "Round_Robin") {
-            try {
-                quantum_field.commitEdit();
-                quantum = (Integer) quantum_field.getValue();
-            } catch (java.text.ParseException e) {
-                labelmsg.setText("Error while reading Quantum value - set to 1 (Default)");
-                labelmsg.setForeground(new Color(255, 0, 0));
-                SwingUtilities.updateComponentTreeUI(mainFrame);
-            }
-            s1 = new Round_Robin(readyQueue, quantum);
-
-        } else if (schedular == "Priority_Non_Preemptive") {
-
-            s1 = new Priority(readyQueue, false);
-
-        } else if (schedular == "Priority_Preemptive") {
-
-            s1 = new Priority(readyQueue, true);
-
-        }
-
+        s1 = intializScheduler();
         s1.execute();
 
         for (Process p : readyQueue) {
@@ -224,44 +193,11 @@ public class GUI_ME {
             stop_resume.setText("Resume");
         } else {
             stop = true;
-            String schedular = comboBox.getSelectedObjects()[0].toString();
-            int quantum = 1;
             
             if (!get_data())
                 return;
 
-            if (schedular == "FCFS") {
-
-                s1 = new FCFS(readyQueue);
-
-            } else if (schedular == "SJF_Preemptive") {
-
-                s1 = new SJF(readyQueue, true);
-
-            } else if (schedular == "SJF_Non_Preemptive") {
-
-                s1 = new SJF(readyQueue, false);
-
-            } else if (schedular == "Round_Robin") {
-                try {
-                    quantum_field.commitEdit();
-                    quantum = (Integer) quantum_field.getValue();
-                } catch (java.text.ParseException e) {
-                    labelmsg.setText("Error while reading Quantum value - set to 1 (Default)");
-                    labelmsg.setForeground(new Color(255, 0, 0));
-                    SwingUtilities.updateComponentTreeUI(mainFrame);
-                }
-                s1 = new Round_Robin(readyQueue, quantum);
-
-            } else if (schedular == "Priority_Non_Preemptive") {
-
-                s1 = new Priority(readyQueue, false);
-
-            } else if (schedular == "Priority_Preemptive") {
-
-                s1 = new Priority(readyQueue, true);
-
-            }
+            s1 = intializScheduler();
 
             if(next == s1.readyQueue.get(process_count-1).getArrivalTime()){
                 modelqueue.setValueAt("P"+s1.readyQueue.get(process_count-1).getProcessID(), s1.readyQueue.get(process_count-1).getProcessID()-1, 0);
@@ -312,7 +248,7 @@ public class GUI_ME {
     }
 
     public static void SchedulerChange() {
-        String schedular = comboBox.getSelectedObjects()[0].toString();
+        schedular = comboBox.getSelectedObjects()[0].toString();
         if (schedular == "Round_Robin") {
             leftPanel_Two.add(labelq);
             leftPanel_Two.add(quantum_field);
