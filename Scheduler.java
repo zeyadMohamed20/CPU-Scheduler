@@ -145,10 +145,9 @@ public abstract class Scheduler
         int maxId = readyQueue.get(readyQueue.size()-1).getProcessID();
         int[]burst = new int[maxId + 1];
         for(int i=0;i<ganttChart.size();i++)
-            burst[ganttChart.get(i).processId] += ganttChart.get(i).endTime - ganttChart.get(i).startTime;
-        for(int i=1;i<readyQueue.size();i++)
-            readyQueue.get(i-1).setBurstTime(burst[i]);
-
+            burst[ganttChart.get(i).processId] += 1;
+        for(int i=0;i<readyQueue.size();i++)
+            readyQueue.get(i).setBurstTime(burst[i+1]);
     }
 
     //To execute scheduling algorithm then:
