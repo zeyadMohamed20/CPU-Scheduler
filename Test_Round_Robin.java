@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Program {
-
-    public static void main(String args[])
+public class Test_Round_Robin
+{
+    public void execute_roundRobin()
     {
         System.out.println("****Round_Robin Scheduler****");
         Scanner input = new Scanner(System.in);
@@ -35,9 +35,9 @@ public class Program {
                     processes.get(i).getBurstTime());
             i++;
         }
-		Scheduler omar = new Round_Robin(processes, quantam);
+        Scheduler s1 = new Round_Robin(processes, quantam);
         s1.execute();
-        ArrayList<Gantt_Process> ganttprocesses = omar.ganttChart;
+        ArrayList<Gantt_Process> ganttprocesses = s1.ganttChart;
 
         i = 0;
         System.out.println("\n***GanttChart***");
