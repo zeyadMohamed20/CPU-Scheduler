@@ -439,18 +439,15 @@ public class GUI_ME {
         panel_Left_Container2.setBorder(BorderFactory.createEmptyBorder(0, 10, 20, 10));
 
         model1 = new DefaultTableModel();
-        table1 = new JTable(model1);
+        table1 = new JTable(model1){
+            public boolean isCellEditable(int row, int column) {                
+                return column != 0;               
+            };
+        };
         model1.addColumn("Proccess ID");
         model1.addColumn("Arrival Time");
         model1.addColumn("CPU Burst Time");
         model1.addColumn("Priority");
-        TableCellEditor editor = new DefaultCellEditor(new JTextField()) {
-            public boolean isCellEditable(EventObject evt) {
-                int column = table1.getSelectedColumn();
-                return column != 0; // make cells in column 0 read-only
-            }
-        };        
-        table1.getColumnModel().getColumn(0).setCellEditor(editor);
         
         a[0] = 1;
         model1.addRow(a);
