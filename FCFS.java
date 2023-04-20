@@ -1,9 +1,8 @@
-package program;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Scanner;
-enum SORTING_CRITERIA2
+enum GANTT_SORTING_CRITERIA
 {
     ID,
     START_TIME,
@@ -20,7 +19,7 @@ public class FCFS extends  Scheduler
         super(readyQueue);
     }
     //sorting based on start time of gantt processes line
-    public void sortGantt(SORTING_CRITERIA2 option)
+    public void sortGantt(GANTT_SORTING_CRITERIA option)
     {
         Collections.sort(merge, new Comparator<Gantt_Process>()
         {
@@ -45,12 +44,12 @@ public class FCFS extends  Scheduler
 
 
     
- public ArrayList<Gantt_Process>get_GanttChart(){
+ public void get_GanttChart(){
          IDLE = new ArrayList<Gantt_Process>();
          merge = new ArrayList<Gantt_Process>();
          ganttChart = new ArrayList<Gantt_Process>();
      
-        sort(SORTING_CRITERIA.valueOf("ARRIVAL_TIME"));
+        sort_readyQueue(SORTING_CRITERIA.ARRIVAL_TIME);
         int a1 = 0;
         int a2 = readyQueue.get(0).getArrivalTime();
         int a3 =  a2+readyQueue.get(0).getBurstTime();
@@ -96,8 +95,8 @@ public class FCFS extends  Scheduler
             merge.add(ganttChart.get(i));
             
         }
-         sortGantt(SORTING_CRITERIA2.valueOf("START_TIME"));
-        return merge;
+        ganttChart = merge;
+        sortGantt(GANTT_SORTING_CRITERIA.START_TIME);
     }
     
    
