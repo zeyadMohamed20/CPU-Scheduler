@@ -9,7 +9,6 @@
  *****************************************************************************************************************/
 
 import java.util.*;
-
 public class Priority extends  Scheduler
 {
     private final PriorityQueue<Process> priorityQueue;
