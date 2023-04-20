@@ -52,7 +52,7 @@ public class GUI_ME {
             try {
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
-                if (schedular == "SJF_Preemptive" || schedular == "Priority_Preemptive") {
+                if (schedular == "Priority_Preemptive") {
                     pri = Integer.valueOf((String) table1.getValueAt(count, 3));
                     if(pri < 0)
                         pri = 0;
@@ -97,11 +97,11 @@ public class GUI_ME {
 
         } else if (schedular == "SJF_Preemptive") {
 
-            s1 = new SJF(readyQueue, false);
+            s1 = new SJF(readyQueue,true);
 
         } else if (schedular == "SJF_Non_Preemptive") {
 
-            s1 = new SJF(readyQueue, true);
+            s1 = new SJF(readyQueue, false);
 
         } else if (schedular == "Round_Robin") {
             try {
@@ -301,7 +301,7 @@ public class GUI_ME {
             leftPanel_Two.remove(labelq);
             leftPanel_Two.remove(quantum_field);
         }
-        if (schedular == "SJF_Preemptive" || schedular == "Priority_Preemptive") {
+        if (schedular == "Priority_Preemptive") {
             table1.getColumnModel().getColumn(3).setPreferredWidth(table1.getColumnModel().getColumn(0).getWidth());
             table1.getColumnModel().getColumn(3).setMaxWidth(table1.getColumnModel().getColumn(0).getMaxWidth());
             table1.getColumnModel().getColumn(3).setMinWidth(table1.getColumnModel().getColumn(0).getMinWidth());
