@@ -60,7 +60,6 @@ public abstract class Scheduler
     public abstract void get_GanttChart();
 
     //Calculate Average Waiting time for any scheduling algorithm (general way)
-    //Calculate Average Waiting time for any scheduling algorithm (general way)
     public void get_averageWaiting()
     {
         float sum =0;
@@ -119,7 +118,6 @@ public abstract class Scheduler
         });
 
     }
-
     public void break_ganttChart()
     {
         int currentIndex = 0; // the current index in the ArrayList
@@ -150,10 +148,9 @@ public abstract class Scheduler
             readyQueue.get(i).setBurstTime(burst[i+1]);
 
     }
-
     //To execute scheduling algorithm then:
-    // calculate ganttchart from drived class and store it into ganttchart attribute
-    // calculate average turn around and store it into averageTurnAround attribute
+    // calculate ganttchart fromm derived class and store it into ganttchart attribute
+    // calculate average turnaround and store it into averageTurnAround attribute
     // calculate average waiting and store it into averageWaiting attribute
     public void execute()
     {
