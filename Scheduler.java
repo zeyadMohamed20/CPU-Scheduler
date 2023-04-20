@@ -94,21 +94,6 @@ public abstract class Scheduler
             sum +=turnAround[i];
         averageTurnAroundTime = sum/(turnAround.length-1);
     }
-
-    /*This function is used to revive ready queue after some modification on it when calculating gantt chart
-      The revival is done by summing time slots of same process in gantt chart to calculate its burst time
-     */
-    public void revive_readyQueue()
-    {
-        int maxId = readyQueue.get(readyQueue.size()-1).getProcessID();
-        int[]burst = new int[maxId + 1];
-        for(int i=0;i<ganttChart.size();i++)
-            burst[ganttChart.get(i).processId] += ganttChart.get(i).endTime - ganttChart.get(i).startTime;
-        for(int i=1;i<readyQueue.size();i++)
-            readyQueue.get(i-1).setBurstTime(burst[i]);
-
-    }
-
     //Sorting the ready queue ascending based on some criteria:
     // ID,ARRIVAL_TIME,BURST_TIME,PRIORITY
     public void sort_readyQueue(SORTING_CRITERIA option)
@@ -150,9 +135,22 @@ public abstract class Scheduler
         }
     }
 
+    /*This function is used to revive ready queue after some modification on it when calculating gantt chart
+      The revival is done by summing time slots of same process in gantt chart to calculate its burst time
+     */
+    public void revive_readyQueue()
+    {
+        int maxId = readyQueue.get(readyQueue.size()-1).getProcessID();
+        int[]burst = new int[maxId + 1];
+        for(int i=0;i<ganttChart.size();i++)
+            burst[ganttChart.get(i).processId] += 1;
+        for(int i=0;i<readyQueue.size();i++)
+            readyQueue.get(i).setBurstTime(burst[i+1]);
+
+    }
     //To execute scheduling algorithm then:
-    // calculate ganttchart from drived class and store it into ganttchart attribute
-    // calculate average turn around and store it into averageTurnAround attribute
+    // calculate ganttchart fromm derived class and store it into ganttchart attribute
+    // calculate average turnaround and store it into averageTurnAround attribute
     // calculate average waiting and store it into averageWaiting attribute
     public void execute()
     {
