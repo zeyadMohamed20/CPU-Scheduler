@@ -3,6 +3,7 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -49,23 +50,19 @@ public class GUI_ME {
             Integer CPU_Time = 0;       // CPU Burst Time
             Integer pri = 0;            // Priority
             try {
-                int temp = Integer.valueOf((String) table1.getValueAt(count, 0));
-                if(temp > process_count){
-                    model1.setValueAt(id.toString(), count, 0);
-                }else{
-                    id = temp;
-                }
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
                 if (schedular == "SJF_Preemptive" || schedular == "Priority_Preemptive") {
                     pri = Integer.valueOf((String) table1.getValueAt(count, 3));
+                    if(pri < 0)
+                        pri = 0;
+                    else if(pri > 127)
+                        pri = 127;
+                    model1.setValueAt(pri.toString(), count, 3);
                 }
             } catch (Exception e) {
                 StackTraceElement[] a = e.getStackTrace();
                 switch(a[2].toString().substring(28, 30)){
-                    case "52":
-                        labelmsg.setText("Missing (Process ID) at row: " + (count + 1) + " - Please press Enter in the cell");
-                        break;
                     case "58":
                         labelmsg.setText("Missing (Arrival Time) of proccess: " + (id) + " - Please press Enter in the cell");
                         break;
@@ -328,6 +325,7 @@ public class GUI_ME {
         }
         for (int i = table1.getRowCount(); i < process_count; i++) {
             change++;
+            a[0]++;
             model1.addRow(a);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
             sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
@@ -338,6 +336,7 @@ public class GUI_ME {
         }
         for(int i = table1.getRowCount()-1; i >= process_count ; i--){
             change++;
+            a[0]--;
             model1.removeRow(i);;
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
             sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
@@ -445,6 +444,15 @@ public class GUI_ME {
         model1.addColumn("Arrival Time");
         model1.addColumn("CPU Burst Time");
         model1.addColumn("Priority");
+        TableCellEditor editor = new DefaultCellEditor(new JTextField()) {
+            public boolean isCellEditable(EventObject evt) {
+                int column = table1.getSelectedColumn();
+                return column != 0; // make cells in column 0 read-only
+            }
+        };        
+        table1.getColumnModel().getColumn(0).setCellEditor(editor);
+        
+        a[0] = 1;
         model1.addRow(a);
         table1.setRowHeight(20);
         table1.setFillsViewportHeight(true);
