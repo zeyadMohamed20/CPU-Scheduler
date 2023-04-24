@@ -51,7 +51,17 @@ public class GUI_ME {
             Integer pri = 0;            // Priority
             try {
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
+                if(arrival <= 0){
+                    labelmsg.setText("Arrival Time is set to Zero or less at proccess: " + (id));
+                    labelmsg.setForeground(Color.RED);
+                    return false;
+                }
                 CPU_Time = Integer.valueOf((String) table1.getValueAt(count, 2));
+                if(CPU_Time <= 0){
+                    labelmsg.setText("CPU Burst Time is set to Zero or less at proccess: " + (id));
+                    labelmsg.setForeground(Color.RED);
+                    return false;
+                }
                 if (schedular == "Priority_Preemptive") {
                     pri = Integer.valueOf((String) table1.getValueAt(count, 3));
                     if(pri < 0)
@@ -63,13 +73,13 @@ public class GUI_ME {
             } catch (Exception e) {
                 StackTraceElement[] a = e.getStackTrace();
                 switch(a[2].toString().substring(28, 30)){
-                    case "58":
+                    case "53":
                         labelmsg.setText("Missing (Arrival Time) of proccess: " + (id) + " - Please press Enter in the cell");
                         break;
                     case "59":
                         labelmsg.setText("Missing (CPU Burst Time) of proccess: " + (id) + " - Please press Enter in the cell");
                         break;
-                    case "61":
+                    case "66":
                         labelmsg.setText("Missing (Priority) of proccess: " + (id) + " - Please press Enter in the cell");
                         break;
                     default:
@@ -328,10 +338,10 @@ public class GUI_ME {
             a[0]++;
             model1.addRow(a);
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
-            sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
+            int height = (process_count + 1) * table1.getRowHeight();
+            sp1.setPreferredSize(new Dimension(600, (height > 500)?500:height));
             modelqueue.addRow(new Integer[2]);
             queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
-            int height = (process_count + 1) * table1.getRowHeight();
             sp2.setPreferredSize(new Dimension(600,(height > 300)?300:height));
         }
         for(int i = table1.getRowCount()-1; i >= process_count ; i--){
@@ -339,10 +349,10 @@ public class GUI_ME {
             a[0]--;
             model1.removeRow(i);;
             table1.setPreferredScrollableViewportSize(table1.getPreferredSize());
-            sp1.setPreferredSize(new Dimension(600, (process_count + 1) * table1.getRowHeight()));
+            int height = (process_count + 1) * table1.getRowHeight();
+            sp1.setPreferredSize(new Dimension(600, (height > 500)?500:height));
             modelqueue.removeRow(i);;
             queue.setPreferredScrollableViewportSize(queue.getPreferredSize());
-            int height = (process_count + 1) * table1.getRowHeight();
             sp2.setPreferredSize(new Dimension(600,(height > 300)?300:height));
         }
         SwingUtilities.updateComponentTreeUI(mainFrame);
@@ -375,7 +385,7 @@ public class GUI_ME {
         // ================================================
 
         JPanel panel_Left = new JPanel();
-        panel_Left.setLayout(new BoxLayout(panel_Left, BoxLayout.Y_AXIS));
+        panel_Left.setLayout(new BorderLayout());
         panel_Left.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
         JPanel panel_Left_Container1 = new JPanel();
@@ -457,7 +467,7 @@ public class GUI_ME {
         table1.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         sp1 = new JScrollPane(table1);
         sp1.setPreferredSize(new Dimension(600, table1.getRowHeight() * 2));
-
+        sp1.setMaximumSize(new Dimension(600, 25*table1.getRowHeight()));
         JPanel button_pane = new JPanel();
         button_pane.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
         button_pane.setBorder(BorderFactory.createEmptyBorder(30, 10, 10, 10));
@@ -473,7 +483,9 @@ public class GUI_ME {
 
         panel_Left.add(panel_Left_Container1, BorderLayout.NORTH);
         panel_Left.add(panel_Left_Container2, BorderLayout.CENTER);
-
+        JScrollPane pl = new JScrollPane(panel_Left);
+        pl.setPreferredSize(new Dimension(700, 1000));
+        pl.setVisible(true);
         // ============================== RIGHT PANEL
         // ================================================
 
@@ -561,7 +573,9 @@ public class GUI_ME {
         panel_right.add(leftPanel_four);
         panel_right.add(container);
         panel_right.add(sp2, BorderLayout.CENTER);
-
+        JScrollPane pr = new JScrollPane(panel_right);
+        pr.setPreferredSize(new Dimension(700, 1000));
+        pr.setVisible(true);
 
         // ================ COLOR ===================================
         leftPanel_four.setBackground(custom_backcolor);
@@ -592,6 +606,8 @@ public class GUI_ME {
         time_container.setBackground(custom_backcolor);
         timerJPanel.setBackground(custom_backcolor);
         sp2.setBackground(custom_backcolor);
+        pl.setBackground(custom_backcolor);
+        pr.setBackground(custom_backcolor);
 
         // option 2,3,4 only
 
@@ -617,7 +633,7 @@ public class GUI_ME {
          * main_Panel.add(panel_right,BorderLayout.EAST);
          */
 
-        JSplitPane spl = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panel_Left, panel_right);
+        JSplitPane spl = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pl, pr);
         spl.setDividerLocation(700);
         spl.setOneTouchExpandable(true);
         BasicSplitPaneUI sui = (BasicSplitPaneUI) spl.getUI();
@@ -629,7 +645,6 @@ public class GUI_ME {
 
         mainFrame.setVisible(true);
 
-        // =====================================================================
 
     }
 
