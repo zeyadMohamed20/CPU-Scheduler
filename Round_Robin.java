@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.io.* ;
 import java.util.* ;
 
 public class Round_Robin extends  Scheduler
@@ -12,19 +11,19 @@ public class Round_Robin extends  Scheduler
     @Override
     public void get_GanttChart()
     {
-        Vector<Integer> flag2 = new Vector<Integer>() ;
+        Vector<Integer> flag2 = new Vector<>() ;
         int currentTime = 0 , NumOfContinue = 0 , minArrivalProcessIndex = 0 , flag = 0 ,size = readyQueue.size();
         ganttChart = new ArrayList<Gantt_Process>();
         //sorting readyQueue based on the arrival time
         sort_readyQueue(SORTING_CRITERIA.ARRIVAL_TIME); ;
-        while(readyQueue.size()!=flag)
+        while(size!=flag)
         {
-            for(int currentProcessIndex = 0 ; currentProcessIndex < (readyQueue.size()-flag); currentProcessIndex++)
+            for(int currentProcessIndex = 0 ; currentProcessIndex < (size-flag); currentProcessIndex++)
             {
                 if(readyQueue.get(currentProcessIndex).getArrivalTime() > currentTime)
                 {
                     NumOfContinue++ ;
-                    if (NumOfContinue == readyQueue.size())
+                    if (NumOfContinue == (size-flag))
                     {
                         Gantt_Process ganttProcess = new Gantt_Process(0, currentTime, readyQueue.get(minArrivalProcessIndex).getArrivalTime());
                         ganttChart.add(ganttProcess);
@@ -39,7 +38,7 @@ public class Round_Robin extends  Scheduler
                     //update the current time
                     currentTime += ((readyQueue.get(currentProcessIndex).getBurstTime()<quantum)?readyQueue.get(currentProcessIndex).getBurstTime():quantum) ;
                     readyQueue.get(currentProcessIndex).setBurstTime((readyQueue.get(currentProcessIndex).getBurstTime()-quantum));
-                    if ( readyQueue.get(currentProcessIndex).getBurstTime() <= 0 )
+                    if (0 >= readyQueue.get(currentProcessIndex).getBurstTime())
                     {
                         flag2.add(currentProcessIndex) ;
                     }
@@ -48,12 +47,14 @@ public class Round_Robin extends  Scheduler
             }
             if(!flag2.isEmpty())
             {
-                for(int i=0 ; i<flag2.size() ; i++)
+                int y =0;
+                for(int i=0 ; i < flag2.size() ; i++)
                 {
                     int x = flag2.get(i);
-                    readyQueue.add(readyQueue.get(flag2.get(i)));
-                    readyQueue.remove(x);
+                    readyQueue.add(readyQueue.get(flag2.get(i)-y));
+                    readyQueue.remove(x-y);
                     flag++;
+                    y++;
                 }
                 flag2.clear();
             }
