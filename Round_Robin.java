@@ -42,8 +42,7 @@ public class Round_Robin extends  Scheduler
                         readyQueue.add(readyQueue.get(currentProcessIndex));
                         readyQueue.remove(currentProcessIndex);
                         flag++;
-                        if(currentProcessIndex>0)
-                            currentProcessIndex--;
+                        currentProcessIndex--;
                     }
                     NumOfContinue = 0 ;
                 }
