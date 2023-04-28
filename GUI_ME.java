@@ -465,6 +465,7 @@ public class GUI_ME {
         model1.addColumn("Arrival Time");
         model1.addColumn("CPU Burst Time");
         model1.addColumn("Priority");
+        table1.putClientProperty("terminateEditOnFocusLost", true);
         
         a[0] = 1;
         model1.addRow(a);
