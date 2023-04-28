@@ -3,7 +3,6 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.table.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -51,8 +50,8 @@ public class GUI_ME {
             Integer pri = 0;            // Priority
             try {
                 arrival = Integer.valueOf((String) table1.getValueAt(count, 1));
-                if(arrival <= 0){
-                    labelmsg.setText("Arrival Time is set to Zero or less at proccess: " + (id));
+                if(arrival < 0){
+                    labelmsg.setText("Arrival Time is set to less than Zero at proccess: " + (id));
                     labelmsg.setForeground(Color.RED);
                     return false;
                 }
@@ -62,7 +61,7 @@ public class GUI_ME {
                     labelmsg.setForeground(Color.RED);
                     return false;
                 }
-                if (schedular == "Priority_Preemptive") {
+                if (schedular == "Priority_Preemptive" || schedular == "Priority_Non_Preemptive") {
                     pri = Integer.valueOf((String) table1.getValueAt(count, 3));
                     if(pri < 0)
                         pri = 0;
@@ -151,7 +150,9 @@ public class GUI_ME {
         times_panel.setVisible(false);
 
         try {
+            stop = true;
             timer.stop();
+            stop_resume.setText("Stop");
         } catch (Exception e) {
             ;
         }
@@ -181,8 +182,8 @@ public class GUI_ME {
         leftPanel_four.removeAll();
 
         try {
-            timer.stop();
             stop = true;
+            timer.stop();
             stop_resume.setText("Stop");
         } catch (Exception e) {
             ;
@@ -205,7 +206,7 @@ public class GUI_ME {
 
         s1.execute();
 
-        timer = new Timer(2000, new Dynamic_Gantt());
+        timer = new Timer(1000, new Dynamic_Gantt());
         timer.setRepeats(true);
         timer.setInitialDelay(2000);
         timer.start();
@@ -238,22 +239,28 @@ public class GUI_ME {
             timer.stop();
             stop_resume.setText("Resume");
         } else {
-            spinner_field.setEnabled(false);
-            table1.setEnabled(false);
-            stop = true;
             
             if (!get_data())
                 return ;
 
             if(!intializScheduler()) 
                 return ;
+
             for (; change > 0; change--) {
                 if(next == s1.readyQueue.get(process_count-change).getArrivalTime()){
                     modelqueue.setValueAt("P"+s1.readyQueue.get(process_count-change).getProcessID(), s1.readyQueue.get(process_count-change).getProcessID()-1, 0);
                     modelqueue.setValueAt(s1.readyQueue.get(process_count-change).getBurstTime(), s1.readyQueue.get(process_count-change).getProcessID()-1, 1);
+                }else if(next > s1.readyQueue.get(process_count-change).getArrivalTime()){
+                    labelmsg.setText("Arrival Time is set to less than current time at proccess: " + (process_count-change));
+                    labelmsg.setForeground(Color.RED);
+                    return ;                
                 }              
             }
 
+            stop = true;
+            spinner_field.setEnabled(false);
+            table1.setEnabled(false);
+            
                       
             s1.execute();
             timer.start();
@@ -311,7 +318,7 @@ public class GUI_ME {
             leftPanel_Two.remove(labelq);
             leftPanel_Two.remove(quantum_field);
         }
-        if (schedular == "Priority_Preemptive") {
+        if (schedular == "Priority_Preemptive" || schedular == "Priority_Non_Preemptive") {
             table1.getColumnModel().getColumn(3).setPreferredWidth(table1.getColumnModel().getColumn(0).getWidth());
             table1.getColumnModel().getColumn(3).setMaxWidth(table1.getColumnModel().getColumn(0).getMaxWidth());
             table1.getColumnModel().getColumn(3).setMinWidth(table1.getColumnModel().getColumn(0).getMinWidth());

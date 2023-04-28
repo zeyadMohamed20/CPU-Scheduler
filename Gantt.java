@@ -47,7 +47,7 @@ public class Gantt extends JPanel {
         }
 
         JPanel chartPanel = createDemoPanel();
-        chartPanel.setPreferredSize(new java.awt.Dimension(500, 300));
+        chartPanel.setPreferredSize(new java.awt.Dimension(550, 400));
         add(chartPanel);
         //setContentPane(chartPanel);
     }
